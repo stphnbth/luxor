@@ -1,0 +1,24 @@
+{
+    "DoctypeEOFs": [
+        "DOCTYPEName",
+        "AfterDOCTYPEName",
+        "AfterDOCTYPEPubKey",
+        "BeforeDOCTYPEPubId",
+        "DOCTYPEPubIdDQ",
+        "DOCTYPEPubIdSQ",
+        "AfterDOCTYPEPubId",
+        "BetweenDOCTYPEPubSysIds",
+        "AfterDOCTYPESysKey",
+        "BeforeDOCTYPESysId",
+        "DOCTYPESysIdDQ",
+        "DOCTYPESysIdSQ",
+        "AfterDOCTYPESysId"
+    ], 
+    "CommentEOFs": [
+        "CommentStartDash",
+        "CommentEndDash",
+        "Comment",
+        "CommentEnd",
+        "CommentEndBang"
+    ]
+}
