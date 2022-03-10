@@ -39,7 +39,7 @@ namespace Luxor
         {            
             _stream = sr;
             _state = State.Data;
-            _buffer = new List<Int32>();
+            _buffer = new StringBuilder();
             // _insertionMode = InsertionMode.Initial;
             _reconsume = false;
         }
@@ -257,23 +257,23 @@ namespace Luxor
                         else if (asciiAlphaUpper.Contains(current))
                         {
                             _currentTag!.Name.Append((char) (current + 0x0020));
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
                         }
 
                         else if (asciiAlphaLower.Contains(current))
                         {
                             _currentTag!.Name.Append((char) current);
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
                         }
 
                         else 
                         {
                             emit(LessThanToken);
                             emit(SolidusToken);
-
+                            /*
                             foreach (Int32 item in _buffer)
                                 emit(new Text(Type.Character, item));
-
+                            */
                             _reconsume = true;
                             _state = State.RCDATA;   
                         }
@@ -333,14 +333,14 @@ namespace Luxor
                         else if (asciiAlphaUpper.Contains(current))
                         {
                             _currentTag!.Name.Append((char) (current + 0x0020));
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
 
                         }
 
                         else if (asciiAlphaLower.Contains(current))
                         {
                             _currentTag!.Name.Append((char) current);
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
 
                         }
 
@@ -348,10 +348,10 @@ namespace Luxor
                         {
                             emit(LessThanToken);
                             emit(SolidusToken);
-
+                            /*
                             foreach (Int32 item in _buffer)
                                 emit(new Text(Type.Character, item));
-
+                            */
                             _reconsume = true;
                             _state = State.RAWTEXT;
                         }
@@ -418,14 +418,14 @@ namespace Luxor
                         else if (asciiAlphaUpper.Contains(current))
                         {
                             _currentTag!.Name.Append((char) (current + 0x0020));
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
 
                         }
 
                         else if (asciiAlphaLower.Contains(current))
                         {
                             _currentTag!.Name.Append((char) current);
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
 
                         }
 
@@ -433,10 +433,10 @@ namespace Luxor
                         {
                             emit(LessThanToken);
                             emit(SolidusToken);
-
+                            /*
                             foreach (Int32 item in _buffer)
                                 emit(new Text(Type.Character, item));
-
+                            */
                             _reconsume = true;
                             _state = State.ScriptData;
                         }
@@ -608,13 +608,13 @@ namespace Luxor
                         else if (asciiAlphaUpper.Contains(current))
                         {
                             _currentTag!.Name.Append((char) (current + 0x0020));
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
                         }
 
                         else if (asciiAlphaLower.Contains(current))
                         {
                             _currentTag!.Name.Append((char) current);
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
 
                         }
 
@@ -622,10 +622,10 @@ namespace Luxor
                         {
                             emit(LessThanToken);
                             emit(SolidusToken);
-
+                            /*
                             foreach (Int32 item in _buffer)
                                 emit(new Text(Type.Character, item));
-
+                            */
                             _reconsume = true;
                             _state = State.ScriptDataEscaped;
                         }
@@ -636,6 +636,7 @@ namespace Luxor
 
                         if ((commonWhitespace.Contains(current) & isAppropriateEndTag()) || current == 0x002F || current == 0x003E)
                         {
+                            /*
                             StringBuilder bufferString = new StringBuilder(_buffer.Count);
 
                             foreach (Int32 item in _buffer)
@@ -648,17 +649,18 @@ namespace Luxor
                                 _state = State.ScriptDataEscaped;
                                 emit(new Text(Type.Character, current));
                             }
+                            */
                         }
 
                         else if (asciiAlphaUpper.Contains(current))
                         {
-                            _buffer.Add((char) (current + 0x0020));
+                            // _buffer.Add((char) (current + 0x0020));
                             emit(new Text(Type.Character, current));
                         }
 
                         else if (asciiAlphaLower.Contains(current))
                         {
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
                             emit(new Text(Type.Character, current));
                         }
 
@@ -772,6 +774,7 @@ namespace Luxor
                         
                         if ((commonWhitespace.Contains(current) & isAppropriateEndTag()) || current == 0x002F || current == 0x003E)
                         {
+                            /*
                             StringBuilder bufferString = new StringBuilder(_buffer.Count);
                             foreach (Int32 item in _buffer)
                                 bufferString.Append(item);
@@ -784,17 +787,18 @@ namespace Luxor
                                 _state = State.ScriptDataDoubleEscaped;
                                 emit(new Text(Type.Character, current));
                             }
+                            */
                         }
 
                         else if (asciiAlphaUpper.Contains(current))
                         {
-                            _buffer.Add((char) (current + 0x0020));
+                            // _buffer.Add((char) (current + 0x0020));
                             emit(new Text(Type.Character, current));
                         }
 
                         else if (asciiAlphaLower.Contains(current))
                         {
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
                             emit(new Text(Type.Character, current));
                         }
 
@@ -1707,7 +1711,7 @@ namespace Luxor
                         break;
                     case State.CharRef:
                         _buffer.Clear();
-                        _buffer.Add(0x0026);
+                        // _buffer.Add(0x0026);
 
                         (current, next) = consume(current, next); 
 
@@ -1719,12 +1723,13 @@ namespace Luxor
 
                         else if (current == 0x0023)
                         {
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
                             _state = State.NumCharRef;
                         }
 
                         else
                         {
+                            /*
                             foreach(Int32 item in _buffer)
                             {
                                 if (_return == State.AttributeValueDQ || _return == State.AttributeValueSQ || _return == State.AttributeValueUQ)
@@ -1732,7 +1737,7 @@ namespace Luxor
                                 else
                                     emit(new Text(Type.Character, item));
                             }
-                        
+                            */
                             _reconsume = true;
                             _state = _return;
                         }
@@ -1740,12 +1745,13 @@ namespace Luxor
                         break;
                     case State.NamedCharRef:
                         (current, next) = consume(current, next);
-                        _buffer.Add(current);
+                        _buffer.Append((char) current);
 
+                        /*
                         StringBuilder match = new StringBuilder(new String(_buffer.Select(x => (char) x).ToArray()));
                         Func<string, bool> lambda = x => x.Substring(0, match.Length).Equals(match.ToString(), StringComparison.Ordinal);  
                         IEnumerable<string> filteredKeys = entities.Keys.Where(lambda);
-
+                        */
                         break;
                     case State.AmbiguousAmpersand:
                         (current, next) = consume(current, next); 
@@ -1778,7 +1784,7 @@ namespace Luxor
 
                         if (current == 0x0078 || current == 0x0058)
                         {
-                            _buffer.Add(current);
+                            _buffer.Append((char) current);
                             _state = State.HexCharRefStart;
                         }
 
@@ -1800,6 +1806,7 @@ namespace Luxor
 
                         else
                         {
+                            /*
                             foreach(Int32 item in _buffer)
                             {
                                 if (_return == State.AttributeValueDQ || _return == State.AttributeValueSQ || _return == State.AttributeValueUQ)
@@ -1807,7 +1814,7 @@ namespace Luxor
                                 else
                                     emit(new Text(Type.Character, item));
                             }
-                        
+                            */
                             _reconsume = true;
                             _state = _return;
                         }                      
@@ -1824,6 +1831,7 @@ namespace Luxor
 
                         else
                         {
+                            /*
                             if (_return == State.AttributeValueDQ || _return == State.AttributeValueSQ || _return == State.AttributeValueUQ)
                                 foreach(Int32 item in _buffer)
                                     appendCharToAttributeValue(item);
@@ -1831,7 +1839,7 @@ namespace Luxor
                             else
                                 foreach(Int32 item in _buffer)
                                     emit(new Text(Type.Character, item));
-                        
+                            */
                             _reconsume = true;
                             _state = _return;
                         }
@@ -1892,8 +1900,8 @@ namespace Luxor
                             _charRefCode = Int32.Parse(codes[_charRefCode]);
                        
                         _buffer.Clear();
-                        _buffer.Add(_charRefCode);
-
+                        // _buffer.Add(_charRefCode);
+                        /*
                         foreach(Int32 item in _buffer)
                         {
                             if (_return == State.AttributeValueDQ || _return == State.AttributeValueSQ || _return == State.AttributeValueUQ)
@@ -1901,7 +1909,7 @@ namespace Luxor
                             else
                                 emit(new Text(Type.Character, item));
                         }
-
+                        */
                         _state = _return;
 
                         break;
