@@ -264,9 +264,9 @@ namespace Reference
             NumCharRefEnd
         }
 
-        public enum InsertionMode {
+        public enum Mode {
             Initial,
-            BeforeHtml,
+            BeforeHTML,
             BeforeHead,
             Head,
             HeadNoScript,
@@ -288,6 +288,57 @@ namespace Reference
             AfterFrameset,
             AfterAfterBody,
             AfterAfterFrameset
+        }
+
+        public enum Errors {
+            AbruptClosingEmptyComment,
+            AbruptDOCTYPEPubId,
+            AbruptDOCTYPESysId,
+            AbsenceDigitsNumCharRef,
+            CDATAHTMLContent,
+            CharRefOutsideUnicodeRange,
+            ControlCharInputStream,
+            ControlCharRef,
+            EndTagWithAttributes,
+            DuplicateAttribute,
+            EndTagTrailingSolidus,
+            EOFBeforeTagName,
+            EOFInCDATA,
+            EOFInComment,
+            EOFInDoctype,
+            EOFInScriptHTMLCommentLikeText,
+            EOFInTag,
+            IncorrectlyClosedComment,
+            IncorrectlyOpenedComment,
+            InvalidCharSeqAfterDOCTYPEName,
+            InvalidFirstCharTagName,
+            MissingAttributeValue,
+            MissingDOCTYPEName,
+            MissingDOCTYPEPubId,
+            MissingDOCTYPESysId,
+            MissingEndTagName,
+            MissingQuoteBeforeDOCTYPEPubId,
+            MissingQuoteBeforeDOCTYPESysId,
+            MissingSemicolonAfterCharRef,
+            MissingWhitespaceAfterDOCTYPEPubKey,
+            MissingWhitespaceAfterDOCTYPESysKey,
+            MissingWhitespaceBeforeDOCTYPEName,
+            MissingWhitespaceBetweenAttributes,
+            MissingWhitespaceBetweenDOCTYPEPubSysIds,
+            NestedComment,
+            NonCharCharRef,
+            NonCharInputStream,
+            NonVoidHTMLElementStartTagTrailingSolidus,
+            NullCharRef,
+            SurrogateCharRef,
+            SurrogateInputStream,
+            UnexpectedCharAfterDOCTYPESysId,
+            UnexpectedCharInAttributeName,
+            UnexpectedCharInUQAttributeValue,
+            UnexpectedEqualsSignBeforeAttributeName,
+            UnexpectedNullChar,
+            UnexpectedSolidusTag,
+            UnknownNamedCharRef
         }
     }
 }
