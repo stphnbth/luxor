@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,10 +9,10 @@ using System.Runtime.Serialization;
 
 namespace Structures
 {
-    public sealed partial class Buffer
+    public sealed partial class CodeBuffer
     {
         internal Int32[] m_Chunk;
-        internal Buffer? m_Previous;
+        internal CodeBuffer? m_Previous;
 
         internal int m_Length;
         internal int m_Offset;
@@ -72,7 +73,7 @@ namespace Structures
                     Append(0x0000, delta);
                 else
                 {
-                    Buffer chunk = FindChunkForIndex(value);
+                    CodeBuffer chunk = FindChunkForIndex(value);
                     if (chunk != this)
                     {
                         int capacityToPreserve = Math.Min(Capacity, Math.Max(Length * 6 / 5, m_Chunk.Length));
@@ -106,7 +107,7 @@ namespace Structures
 
         /* Public Methods */
 
-        public Buffer Append(Int32 value)
+        public CodeBuffer Append(Int32 value)
         {
             int nextIndex = m_Length;
             Int32[] currentChunk = m_Chunk;
@@ -122,7 +123,7 @@ namespace Structures
             return this;
         }
 
-        public Buffer Append(Int32 value, int repeatCount)
+        public CodeBuffer Append(Int32 value, int repeatCount)
         {
             if (repeatCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(repeatCount));
@@ -158,20 +159,29 @@ namespace Structures
             return this;
         }
 
-        /*
-        public Buffer AppendJoin(params Int32?[] values)
+        public CodeBuffer AppendJoin(params Int32[] values)
         {
-        
-        }
-        */
+            if (values == null)
+                throw new ArgumentNullException("values");
 
-        public Buffer Clear()
+            Debug.Assert(values != null);
+            
+            if (values.Length == 0)
+                return this;
+
+            for (int i = 0; i < values.Length; i++)
+                Append(values[i]);
+            
+            return this;
+        }
+
+        public CodeBuffer Clear()
         {
             this.Length = 0;
             return this;
         }
 
-        public Buffer Insert(int index, Int32 value)
+        public CodeBuffer Insert(int index, Int32 value)
         {
             if (index > Length)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -180,7 +190,7 @@ namespace Structures
             return this;
         }
 
-        public Buffer Insert(int index, Int32[] value)
+        public CodeBuffer Insert(int index, Int32[] value)
         {
             if (index > Length)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -190,9 +200,9 @@ namespace Structures
             return this;
         }
 
-        public Buffer Insert(int index, ref Int32 value, int count) => Insert(index, MemoryMarshal.CreateReadOnlySpan<Int32>(ref value, count), count);
+        public CodeBuffer Insert(int index, ref Int32 value, int count) => Insert(index, MemoryMarshal.CreateReadOnlySpan<Int32>(ref value, count), count);
 
-        private Buffer Insert(int index, ReadOnlySpan<Int32> value, int count)
+        private CodeBuffer Insert(int index, ReadOnlySpan<Int32> value, int count)
         {
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
@@ -208,7 +218,7 @@ namespace Structures
 
             Debug.Assert(toInsert + this.Length < int.MaxValue);
 
-            MakeRoom(index, (int) toInsert, out Buffer chunk, out int indexInChunk, false);
+            MakeRoom(index, (int) toInsert, out CodeBuffer chunk, out int indexInChunk, false);
 
             while (count > 0)
             {
@@ -220,7 +230,7 @@ namespace Structures
         }
 
 
-        public Buffer Remove(int start, int length)
+        public CodeBuffer Remove(int start, int length)
         {
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
@@ -241,16 +251,68 @@ namespace Structures
             return this;
 
         }
-
+        
         /*
+        public override string ToString()
+        {
+            AssertInvariants();
+
+            if (Length == 0)
+                return string.Empty;
+
+            string result = string.FastAllocateString(Length);
+            CodeBuffer? chunk = this;
+
+            do
+            {
+                if (chunk.m_Length > 0)
+                {
+                    char[] sourceArray = chunk.m_Chunk.Select(x => (char) x).ToArray();
+                    int chunkOffset = chunk.m_Offset;
+                    int chunkLength = chunk.m_Length;
+
+                    if ((uint)(chunkLength + chunkOffset) > (uint)result.Length || (uint)chunkLength > (uint)sourceArray.Length)
+                        throw new ArgumentOutOfRangeException(nameof(chunkLength));
+
+                    Buffer.Memmove(
+                        ref Unsafe.Add(ref result.GetRawStringData(), chunkOffset),
+                        ref MemoryMarshal.GetArrayDataReference(sourceArray),
+                        (nuint)chunkLength
+                    );
+                }
+
+                chunk = chunk.m_Previous;
+            }
+            while (chunk != null);
+            
+            return result;
+        }
+        
         public string ToString(int startIndex, int length)
         {
+            int currentLength = this.Length;
 
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (startIndex > currentLength)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length));
+            if (startIndex > currentLength - length)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            AssertInvariants();
+            string result = string.FastAllocateString(length);
+            // string result = string.Empty;
+
+            CopyTo(startIndex, new Span<char>(ref result.GetRawStringData() result.Length), result.Length);
+
+            return result;
         }
         */
-
+        
         /* Helper Functions */
-        private Buffer(Buffer pb)
+        private CodeBuffer(CodeBuffer pb)
         {
             m_Length = pb.m_Length;
             m_Offset = pb.m_Offset;
@@ -261,7 +323,7 @@ namespace Structures
             AssertInvariants();
         }
 
-        private Buffer(int size, int max, Buffer? previous)
+        private CodeBuffer(int size, int max, CodeBuffer? previous)
         {   
             Debug.Assert(size > 0);
             Debug.Assert(max > 0);
@@ -281,7 +343,7 @@ namespace Structures
         {
             Debug.Assert(m_Offset + m_Chunk.Length >= m_Offset, "The length of the string is greater than int.MaxValue");
 
-            Buffer currentChunk = this;
+            CodeBuffer currentChunk = this;
             int maxCapacity = this.m_MaxCapacity;
 
             while (true)
@@ -293,7 +355,7 @@ namespace Structures
                 Debug.Assert(currentChunk.m_Length >= 0);
                 Debug.Assert(currentChunk.m_Offset >= 0);
 
-                Buffer? prevChunk = currentChunk.m_Previous;
+                CodeBuffer? prevChunk = currentChunk.m_Previous;
                 if (prevChunk == null)
                 {
                     Debug.Assert(currentChunk.m_Offset == 0);
@@ -322,7 +384,7 @@ namespace Structures
 
             Int32[] chunk = GC.AllocateUninitializedArray<Int32>(newChunkLength);
 
-            m_Previous = new Buffer(this);
+            m_Previous = new CodeBuffer(this);
             m_Offset += m_Length;
             m_Length = 0;
 
@@ -331,11 +393,11 @@ namespace Structures
             AssertInvariants();
         }
 
-        private Buffer FindChunkForIndex(int index)
+        private CodeBuffer FindChunkForIndex(int index)
         {
             Debug.Assert(0 <= index && index <= Length);
 
-            Buffer result = this;
+            CodeBuffer result = this;
             while (result.m_Offset > index)
             {
                 Debug.Assert(result.m_Previous != null);
@@ -346,7 +408,7 @@ namespace Structures
             return result;
         }
 
-        private void MakeRoom(int index, int count, out Buffer chunk, out int indexInChunk, bool doNotMove)
+        private void MakeRoom(int index, int count, out CodeBuffer chunk, out int indexInChunk, bool doNotMove)
         {
             AssertInvariants();
             Debug.Assert(count > 0);
@@ -377,7 +439,7 @@ namespace Structures
                 return;
             }
 
-            Buffer newChunk = new Buffer(Math.Max(count, DefaultCapacity), chunk.m_MaxCapacity, chunk.m_Previous);
+            CodeBuffer newChunk = new CodeBuffer(Math.Max(count, DefaultCapacity), chunk.m_MaxCapacity, chunk.m_Previous);
             newChunk.m_Length = count;
 
             int copyCount1 = Math.Min(count, indexInChunk);
@@ -404,9 +466,9 @@ namespace Structures
             AssertInvariants();
         }
 
-        private Buffer? Next(Buffer chunk) => chunk == this ? null : FindChunkForIndex(chunk.m_Offset + chunk.m_Length);
+        private CodeBuffer? Next(CodeBuffer chunk) => chunk == this ? null : FindChunkForIndex(chunk.m_Offset + chunk.m_Length);
 
-        private void Remove(int start, int count, out Buffer chunk, out int indexInChunk)
+        private void Remove(int start, int count, out CodeBuffer chunk, out int indexInChunk)
         {
             AssertInvariants();
             Debug.Assert(start >= 0 && start < Length);
@@ -415,7 +477,7 @@ namespace Structures
             int endInChunk = 0;
 
             chunk = this;
-            Buffer? endChunk = null;
+            CodeBuffer? endChunk = null;
             while (true)
             {
                 if (end - chunk.m_Offset >= 0)
@@ -471,7 +533,7 @@ namespace Structures
 
         }
 
-        private void ReplaceInPlaceAtChunk(ref Buffer? chunk, ref int indexInChunk, ref Int32 value, int count)
+        private void ReplaceInPlaceAtChunk(ref CodeBuffer? chunk, ref int indexInChunk, ref Int32 value, int count)
         {
             if (count != 0)
             {
