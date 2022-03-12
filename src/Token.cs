@@ -10,7 +10,9 @@ namespace Luxor
 
         public void PrintToken()
         {
-            System.Diagnostics.Debug.WriteLine(Type.ToString().ToUpper());
+            StringBuilder ptstr = new StringBuilder(Type.ToString().ToUpper());
+            ptstr.Append(this.ToString());
+            System.Diagnostics.Debug.WriteLine(ptstr);
         }
     }
 
@@ -24,12 +26,18 @@ namespace Luxor
 
         public Doctype() : base(Type.DOCTYPE) => _name = new StringBuilder();
         public Doctype(string name) : base(Type.DOCTYPE) => _name = new StringBuilder(name);
-        public Doctype(Int32 name) : base(Type.DOCTYPE) => _name = new StringBuilder((char) name);
+        public Doctype(Int32 name) : base(Type.DOCTYPE) => _name = new StringBuilder(new String((char) name, 1));
 
         public StringBuilder Name { get => _name; }
         public StringBuilder Pub { get => _pub!; set => _pub = value; }
         public StringBuilder Sys { get => _sys!; set => _sys = value; }
         public bool ForceQuirks { get => forceQuirks; set => forceQuirks = value; }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder("\tName: ");
+            return sb.Append(Name.ToString()).ToString();
+        }
     }
         
     // START TAG & END TAG
@@ -41,17 +49,16 @@ namespace Luxor
 
         public Tag(Type type) : base(type) => _name = new StringBuilder();
         public Tag(Type type, string name) : base(type) => _name = new StringBuilder(name);
-        public Tag(Type type, Int32 name) : base(type) => _name = new StringBuilder((char) name);
+        public Tag(Type type, Int32 name) : base(type) => _name = new StringBuilder(new String((char) name, 1));
 
         public bool SelfClosing { get => _selfClosing; set => _selfClosing = value; }
         public StringBuilder Name { get => _name; }
         public List<(StringBuilder name, StringBuilder value)> Attributes { get => _attributes; }
 
-        public void Reset() 
+        public override string ToString()
         {
-            SelfClosing = false;
-            Name.Clear();
-            Attributes.Clear();
+            StringBuilder sb = new StringBuilder("\tName: ");
+            return sb.Append(Name.ToString()).ToString();
         }
     }
 
@@ -62,9 +69,15 @@ namespace Luxor
 
         public Text(Type type) : base(type) => _data = new StringBuilder();
         public Text(Type type, string data) : base(type) => _data = new StringBuilder(data);
-        public Text(Type type, Int32 data) : base(type) => _data = new StringBuilder((char) data);
+        public Text(Type type, Int32 data) : base(type) => _data = new StringBuilder(new String((char) data, 1));
 
         public StringBuilder Data { get => _data; }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder("\tData: ");
+            return sb.Append(Data.ToString()).ToString();
+        }
     }
 
     // EOF

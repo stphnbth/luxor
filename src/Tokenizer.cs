@@ -1733,22 +1733,30 @@ namespace Luxor
 
                         break;
                     case State.NamedCharRef:
-                        // filter down to a smaller and smaller collection because it's easier to implement
-                        string? match = null;
-                        List<string> filtered = entities.Keys.ToList();
+                        // always enter from State.CharRef when _reconsume is true
+                        (current, next) = consume(current, next);
 
-                        while(filtered.Count > 0 && match is not null)
+                        // filter down to a smaller and smaller collection because it's easier to implement
+                        char[] carr = new char[_buffer.Count + 1];
+                        carr[_buffer.Count] = (char) current;
+                        _buffer.CopyTo(carr, 0);
+
+                        StringBuilder toMatch = new StringBuilder(new String(carr));
+
+                        List<string> filtered = entities.Keys.ToList().Where(x => x.StartsWith(toMatch.ToString())).ToList();
+                        string? match = null;
+
+                        while(filtered.Count > 0)
                         {
-                            (current, next) = consume(current, next);
-                            _buffer.Enqueue((char) current);
+                            toMatch.Append((char) next);
                             
-                            // is this next line stupid??
-                            string str = new String(new ReadOnlySpan<char>(_buffer.ToArray()));
-                            
-                            // filter and check for exact match
-                            filtered = filtered.Where(x => x.StartsWith(str)).ToList();
-                            if (filtered.Contains(str))
-                                match = str;
+                            filtered = filtered.Where(x => x.StartsWith(toMatch.ToString())).ToList();
+                            if (filtered.Count > 0)
+                            {
+                                _buffer.Enqueue((char) current);
+                                (current, next) = consume(current, next);
+                                match = filtered[0];
+                            }                            
                         }
 
                         if (match is not null)
@@ -1765,8 +1773,11 @@ namespace Luxor
 
                                 _buffer.Clear();
 
-                                StringBuilder hexstring = new StringBuilder();
-                                foreach (var ch in match)
+                                foreach (var ch in entities[match].Item2)
+                                    _buffer.Enqueue(ch);
+
+                                /*
+                                StringBuilder hexstring = new StringBuilder();                                   
                                 {
                                     if (ch == '\\')
                                         if (hexstring.Length > 0)
@@ -1780,7 +1791,7 @@ namespace Luxor
                                 }
                                 
                                 _buffer.Enqueue((char) Int32.Parse(hexstring.ToString(), NumberStyles.AllowHexSpecifier));
-
+                                */
 
                                 flushCodePoints();
                                 _state = _return;
@@ -1978,8 +1989,7 @@ namespace Luxor
             if (token.Type == Type.StartTag)
                 _lastEmittedStartTag = (Tag) token;
 
-            if (token.Type != Type.Character)
-                token.PrintToken();
+            token.PrintToken();
         }
 
         private void flushCodePoints()
