@@ -13,8 +13,9 @@ class Program
         {
             StreamReader sr = new StreamReader(new FileStream("test_files/index.html", FileMode.Open));
             Luxor.Tokenizer tokenizer = new Luxor.Tokenizer(sr);
+            Luxor.Parser parser = new Luxor.Parser(tokenizer);
 
-            tokenizer.run();
+            parser.run();
             
             sr.Close();
         }

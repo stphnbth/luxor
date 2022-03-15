@@ -16,6 +16,13 @@ namespace Luxor
         private int _scriptNestingLevel;
         private bool _pause;
 
+        public Parser (Tokenizer tk)
+        {
+            _mode = Mode.Initial;
+            _scriptNestingLevel = 0;
+            _pause = false;
+        }
+
         public void run()
         {
             while (true)

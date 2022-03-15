@@ -44,7 +44,7 @@ namespace Luxor
             _reconsume = false;
         }
 
-        public void run() 
+        public void next() 
         {
             Int32 next = _stream.Read();
             Int32 current = 0x0000;

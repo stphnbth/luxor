@@ -181,7 +181,8 @@ namespace Reference
             CommentEOFs = eofs[1];
         }
 
-        public enum State {
+        public enum State 
+        {
             Data, 
             RCDATA,
             RAWTEXT,
@@ -290,7 +291,8 @@ namespace Reference
             AfterAfterFrameset
         }
 
-        public enum Errors {
+        public enum Error 
+        {
             AbruptClosingEmptyComment,
             AbruptDOCTYPEPubId,
             AbruptDOCTYPESysId,
