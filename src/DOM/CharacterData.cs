@@ -2,13 +2,10 @@ using System.Diagnostics;
 
 namespace Luxor.DOM
 {
-    public class CharacterData : Node 
+    public interface CharacterData : Node 
     {
         public string Data { get; set; }
         public int Length { get; }
-
-        public CharacterData() => Data = "";
-        public CharacterData(string data) => Data = data;
 
         public void Append(string data) => Replace(Length, 0, Data);
         public void Insert(int offset, string data) => Replace(offset, 0, data);

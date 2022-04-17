@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-
-using Reference;
+﻿using Luxor;
+using Luxor.DOM;
 
 class Program
 {
@@ -12,8 +8,7 @@ class Program
         try
         {
             StreamReader sr = new StreamReader(new FileStream("test_files/index.html", FileMode.Open));
-            Luxor.Tokenizer tokenizer = new Luxor.Tokenizer(sr);
-            Luxor.Parser parser = new Luxor.Parser(tokenizer);
+            Parser parser = new Parser(sr);
 
             parser.run();
             

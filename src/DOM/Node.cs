@@ -9,26 +9,24 @@ using static Reference.DataTables;
 
 namespace Luxor.DOM
 {
-    public abstract class Node
+    public interface Node
     {
-        protected NodeType Type { get; set; }
-        protected string? Name { get; set; }
+        protected string? BaseURI { get; }
+        protected List<Node>? ChildNodes { get; }
+        protected Node? FirstChild { get; }
         protected bool IsConnected { get; }
-        protected Document? Document { get; }
+        protected Node? LastChild { get; }
+        protected Node? NextSibling { get; }
+        protected string? NodeName { get; }
+        protected NodeType NodeType { get; }
+        protected string? NodeValue { get; set; }
+        protected Document? OwnerDocument { get; }
         protected Node? ParentNode { get; }
         protected Element? ParentElement { get; }
-        protected List<Node>? ChildNodes { get; set; }
-        protected Node? FirstChild { get; set; }
-        protected Node? LastChild { get; set; }
-        protected Node? PreviousSibling { get; set; }
-        protected Node? NextSibling { get; set; }
+        protected Node? PreviousSibling { get; }
+        protected string? TextContent { get; set; }
 
-        private string? _value;
-        private string? _textContext;
-
-        public string BaseURI { get => (Document is not null) ? Document.DocumentURI : ""; }
-
-        public Node GetRootNode(bool composed)
+        Node GetRootNode(bool composed)
         {
             if (composed) {}    // TODO: RETURN SHADOW INCLUDING ROOT
 
@@ -40,45 +38,45 @@ namespace Luxor.DOM
             return result;
         }
 
-        public bool HasChildNodes() => ChildNodes is not null && ChildNodes.Count > 0 ? true : false;
+        bool HasChildNodes() => ChildNodes is not null && ChildNodes.Count > 0 ? true : false;
 
 
-        public void Normalize()
+        void Normalize()
         {
             throw new NotImplementedException();
         }
 
-        public Node CloneNode(bool deep)
+        Node CloneNode(bool deep)
         {
             throw new NotImplementedException();
         }
 
-        public bool IsEqualNode(Node otherNode)
+        bool IsEqualNode(Node otherNode)
         {
             throw new NotImplementedException();
         }
 
-        public ushort CompareDocumentPosition(Node other)
+        ushort CompareDocumentPosition(Node other)
         {
             throw new NotImplementedException();
         }
 
-        public bool Contains(Node? other)
+        bool Contains(Node? other)
         {
             throw new NotImplementedException();
         }
 
-        public string LookupPrefix(string nspace)
+        string LookupPrefix(string nspace)
         {
             throw new NotImplementedException();
         }
 
-        public string LookupNamespaceURI(string prefix)
+        string LookupNamespaceURI(string prefix)
         {
             throw new NotImplementedException();
         }
 
-        public string IsDefaultNamepsace(string nspace)
+        string IsDefaultNamepsace(string nspace)
         {
             throw new NotImplementedException();
         }

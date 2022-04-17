@@ -139,7 +139,7 @@ namespace Luxor.DOM
             throw new NotImplementedException();
         }
 
-        Element() 
+        public Element() 
         {
             throw new NotImplementedException();
         }
