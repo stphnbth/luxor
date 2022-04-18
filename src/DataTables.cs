@@ -8,6 +8,8 @@ namespace Reference
         public static readonly Dictionary<string, (List<Int32>, string)> entities;
         public static readonly Dictionary<Int32, string> codes;
 
+        
+        // TODO: replace ascii lists and migrate to bit manipulation
         public static readonly List<Int32> asciiWhitespace;
         public static readonly List<Int32> asciiDigit;
         public static readonly List<Int32> asciiAlphaUpper;
