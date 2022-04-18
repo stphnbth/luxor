@@ -42,13 +42,9 @@ namespace Luxor
             _reconsume = false;
         }
 
-
-
-        public Token GetToken(char next) 
-        {
-            Int32 next = _stream.Read();
-            Int32 current = 0x0000;
-
+        /*
+        public Token GetToken(int current, int next) 
+        { 
             // STATES THAT DON'T HAVE EOF BRANCHES HAVE TO RECONSUME 
 
             while (next > 0 || _reconsume) 
@@ -1047,7 +1043,7 @@ namespace Luxor
                         {
                             (current, next) = consumeCharacters("[CDARA[", current, next);
 
-                            /*
+                            
                             var node = adjustCurrentNode();
                             if (node & !_htmlNamespace.Contains(node)) 
                                 _state = State.CDATASection;
@@ -1057,7 +1053,7 @@ namespace Luxor
                                 _comment!.Data = "[CDATA[";
                                 _state = State.BogusComment;
                             }
-                            */
+                            
 
                             State = State.CDATASection;
                         }
@@ -1775,7 +1771,6 @@ namespace Luxor
                                 foreach (var ch in entities[match].Item2)
                                     _buffer.Enqueue(ch);
 
-                                /*
                                 StringBuilder hexstring = new StringBuilder();                                   
                                 {
                                     if (ch == '\\')
@@ -1790,7 +1785,6 @@ namespace Luxor
                                 }
                                 
                                 _buffer.Enqueue((char) Int32.Parse(hexstring.ToString(), NumberStyles.AllowHexSpecifier));
-                                */
 
                                 flushCodePoints();
                                 State = _return;
@@ -1947,6 +1941,7 @@ namespace Luxor
 
             runEOF();
         }
+        */
 
 
         // TODO: IMPLEMENT SPANS 
@@ -1962,6 +1957,7 @@ namespace Luxor
             _currentTag.Attributes[length - 1].value.Append((char) character);
         }        
 
+        /*
         private (Int32, Int32) consume(Int32 current, Int32 next) 
         {
             if (_reconsume)
@@ -1982,6 +1978,7 @@ namespace Luxor
             
             return (current, _stream.Read());
         }
+        */
 
         private void emit(Token token) 
         {
@@ -2011,11 +2008,13 @@ namespace Luxor
             return false;
         }
         
+        /*
         private bool lookAhead(string toMatch, StringComparison comparisonType)
         {
             StringBuilder match = new StringBuilder(new String(_stream.ExposeCharBuffer(toMatch.Length)));
             return toMatch.Equals(match.ToString(), comparisonType);
         }
+        */
 
         private void runEOF()
         {

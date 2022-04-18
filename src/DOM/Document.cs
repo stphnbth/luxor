@@ -1,6 +1,6 @@
 namespace Luxor.DOM
 {
-    public class Document : Node
+    public class Document // : Node
     {
         private string? _origin = null;
         private string _type = "html";
@@ -60,9 +60,11 @@ namespace Luxor.DOM
 
         public Document()
         {
+            /*
             Type = NodeType.Document;
             Name = "#document";
-
+            */
+            
             Implementation = new DOMImplementation();
             CharacterSet = "UTF8";
             ContentType = "application/xml";

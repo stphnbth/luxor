@@ -1,6 +1,6 @@
 namespace Luxor.DOM
 {
-    public class ElementInternals : Element 
+    public class ElementInternals // : Element 
     {
         readonly ShadowRoot? shadowRoot;
         readonly bool willValidate;

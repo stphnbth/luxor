@@ -8,140 +8,128 @@ using static Reference.DataTables;
 
 namespace Luxor.DOM
 {
-    public class Element : Node 
+    public interface Element : Node 
     {
-        private NamedNodeMap _attributes = new NamedNodeMap();
-        private string _customState = "undefined";
-        
-        public string? Namespace { get; }
-        public string? Prefix { get; }
+        protected NamedNodeMap? Attributes { get; }
+        protected List<string> ClassList { get; }
+        protected string ClassName { get; set; }
+        protected string ID { get; set; }
+        protected string LocalName { get; }
+        public string? NamespaceURI { get; }
+        protected string? Prefix { get; }
+        protected ShadowRoot? ShadowRoot { get; }
+        protected string Slot { get; set; }
+        protected string TagName { get; }
 
-        public string LocalName { get => Name!; }
-        public string TagName { get => QualifiedName.ToUpper(); } // TODO: NAMESPACES...
-        public string QualifiedName => Prefix is null ? Name! : Prefix + ":" + Name!;
- 
-        public string ID { get => _attributes["id"]; set => _attributes.Add("id", value); }
-        public string ClassName { get => _attributes["class"]; set => _attributes.Add("class", value); }
-        
-        public string[] ClassList 
-        {
-            get => _attributes["class"].Split(' ');
-            set => _attributes["class"] = _attributes["class"] + " " + value;
-        } 
-
-        public string Slot { get => _attributes["slot"]; set => _attributes["slot"] = value; }
-
-        public ShadowRoot? ShadowRoot { get; } 
-
-        public bool HasAttributes()
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<string> GetAttributeNames()
+        ShadowRoot AttachShadow(ShadowRoot init)
         {
             throw new NotImplementedException();
         }
         
-        public string GetAttribute(string qualifiedName)
+        Element? Closest(string selectors)
         {
             throw new NotImplementedException();
         }
-
-        public string GetAttribute(string nspace, string name)
+        
+        string? GetAttribute(string qualifiedName)
         {
             throw new NotImplementedException();
         }
-
-        public void SetAttribute(string qualifiedName, string value)
+        
+        string? GetAttributeNS(string? nspace, string localName)
         {
             throw new NotImplementedException();
         }
-
-        public void SetAttribute(string nSpace, string qualifiedName, string value)
+        
+        List<String> GetAttributeNames()
         {
             throw new NotImplementedException();
         }
-
-        public void RemoveAttribute(string qualifiedName)
+        
+        Attr? GetAttributeNode(string qualifiedName)
         {
             throw new NotImplementedException();
         }
-
-        public void RemoveAttribute(string nSpace, string name)
+        
+        Attr? GetAttributeNodeNS(string? nspace, string localName)
         {
             throw new NotImplementedException();
         }
-
-        public bool ToggleAttribute(string qualifiedName, bool force = false)
+        
+        List<Element> GetElementsByTagName(string qualifiedName)
         {
             throw new NotImplementedException();
         }
-
-        public bool HasAttribute(string qualifiedName)
+        
+        List<Element> GetElementsByTagNameNS(string? nspace, string localName)
         {
             throw new NotImplementedException();
         }
-
-        public bool HasAttribute(string nSpace, string name)
+        
+        List<Element> GetElementsByClassName(string classNames)
         {
             throw new NotImplementedException();
         }
-
-        public Attr GetAttributeNode(string qualifiedName)
+        
+        bool HasAttribute(string qualifiedName)
         {
             throw new NotImplementedException();
         }
-
-        public Attr GetAttributeNode(string nSpace, string name)
+        
+        bool HasAttributes()
         {
             throw new NotImplementedException();
         }
-
-        public Attr SetAttributeNode(Attr attribute)
+        
+        bool HasAttributeNS(string? nspace, string localName)
         {
             throw new NotImplementedException();
         }
-
-        public Attr RemoveAttributeNode(Attr attribute)
+        
+        bool Matches(string selectors)
         {
             throw new NotImplementedException();
         }
-
-        public ShadowRoot AttachShadow(ShadowRootMode mode, 
-                SlotAssignmentMode slotAssignemnt = SlotAssignmentMode.Named)
+        
+        void RemoveAttribute(string qualifiedName)
         {
             throw new NotImplementedException();
         }
-
-        public Element? Closest(string selectors)
+        
+        void RemoveAttributeNS(string? nspace, string localName)
         {
             throw new NotImplementedException();
         }
-
-        public bool Matches(string selectors)
+        
+        Attr RemoveAttributeNode(Attr attr)
         {
             throw new NotImplementedException();
         }
-
-        public List<Element> GetElementsByTagName(string qualifiedName)
+        
+        void SetAttribute(string qualifiedName, string value)
         {
             throw new NotImplementedException();
         }
-
-        public List<Element> GetElementsByTagName(string nSpace, string name)
+        
+        void SetAttributeNS(string? nspace, string qualifiedName, string value)
         {
             throw new NotImplementedException();
         }
-
-        public List<Element> GetElementsByClassName(string classNames)
+        
+        bool ToggleAttribute(string qualifiedName, bool? force)
         {
             throw new NotImplementedException();
         }
-
-        public Element() 
+        
+        Attr? SetAttributeNode(Attr attr)
         {
             throw new NotImplementedException();
         }
+        
+        Attr? SetAttributeNodeNS(Attr attr)
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }

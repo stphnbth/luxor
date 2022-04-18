@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Luxor.DOM
 {
-    public class Text : CharacterData
+    public class Text // : CharacterData
     {        
         public Text() : base () {}
 

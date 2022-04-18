@@ -1,37 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using System.Diagnostics;
-
-using static Reference.DataTables;
-
 namespace Luxor.DOM
 {
-    public class Attr : Node 
+    public interface Attr : Node 
     {
-        public string? Namespace { get; }
-        public string? Prefix { get; }
-        public Element? OwnerElement { get; }
-        public string? Value { get; set; }
 
-        public string QualifiedName => Prefix is null ? Name! : Prefix + ":" + Name!;
+        protected string LocalName { get; }
+        protected string Name { get; }
+        protected string? NamespaceURI { get; }
+        protected Element? OwnerElement { get; }
+        protected string? Prefix { get; }
+        protected string Value { get; }
 
-        public Attr(string name, string? nspace = null, string? prefix = null, Element? element = null, string value = "")
-        {
-            if (nspace is not null)
-                Namespace = nspace;
-            
-            if (prefix is not null)
-                Prefix = prefix;
-
-            if (element is not null)
-                OwnerElement = element;
-
-            if (!value.Equals(""))
-                Value = value;
-        }
-
+        /*
         public override bool Equals(object? obj)
         {         
             if (obj is not null && obj is Attr)
@@ -52,6 +31,7 @@ namespace Luxor.DOM
         {
             return HashCode.Combine(Name, Value);
         }
+        */
     }
 
 }

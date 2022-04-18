@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 
 using static Reference.DataTables;
@@ -54,8 +55,53 @@ namespace Luxor
         }
 
         private void prescanByteStream(Int32 size) { throw new NotImplementedException(); }
+
         private void getAttribute() { throw new NotImplementedException(); }
-        private void getXMLEncoding() { throw new NotImplementedException(); }
+
+        private string? getXMLEncoding(Stream stream) 
+        {
+            // 1 encodingPosition = stream.Postion
+            // 2
+            Span<byte> buffer = new byte[5];
+            byte[] xmlSequence = {0x3C, 0x3F, 0x78, 0x6D, 0x6C};
+
+            stream.Read(buffer);
+            if (buffer.Length < 5 || buffer.ToArray() != xmlSequence) { return null; }
+
+            // 3
+               
+            // 4
+            byte[] encodingSequence = {0x65, 0x6E, 0x63, 0x6F, 0x64, 0x69, 0x6E, 0x67};
+            buffer = new byte[7];
+
+            while (buffer != encodingSequence)
+            {
+                if (!stream.CanRead) { return null; }
+
+                // buffer[buffer.Length] = stream.ReadByte();
+
+            }
+
+
+            // 5    
+
+            // 6    
+            // 7
+            // 8    
+            // 9   
+            // 10   
+            // 11    
+            // 12    
+            // 13    
+            // 14    
+            // 15    
+            // 16    
+            // 17
+            // 18 
+
+            return "";
+
+        }
 
         // 12.2.3.4 Changing the Encoding While Parsing
         private void changeEncoding() { throw new NotImplementedException(); }
@@ -102,7 +148,7 @@ namespace Luxor
             }
 
             // if the adjusted current node is an element in the HTML namespace
-            if (_adjustedCurrentNode.Namespace == "http://www.w3.org/1999/xhtml")
+            if (_adjustedCurrentNode.NamespaceURI == "http://www.w3.org/1999/xhtml")
             {
 
             }
@@ -155,7 +201,7 @@ namespace Luxor
         {
             while (!_stream.EndOfStream)
             {
-                Token token =  _tokenizer.GetToken(preprocess(_stream.Read()));
+                Token token =  new Token(Type.DOCTYPE); // _tokenizer.GetToken(preprocess(_stream.Read()));
 
                 switch (_mode)
                 {
