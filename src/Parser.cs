@@ -279,17 +279,145 @@ namespace Luxor
 
         // 13.2.3.1 Parsing with a Known Character Encoding
         // 13.2.3.2 Determining the Character Encoding
+
+        // TODO: determineEncodings - allow for encodings other than UTF-8
         private (Encoding, string) determineEncoding()
         {
-            // TODO: add option for other encodings
-            // TODO: add an encodings class
             return (Encoding.UTF8, "irrelevant");            
         }
 
         private void prescanByteStream(Int32 size) { throw new NotImplementedException(); }
 
-        private void getAttribute() { throw new NotImplementedException(); }
+        // TODO: Parser.getAttribute - figure out how to gracefully exit all the searching while loops
+        // TODO: Parser.getAttribute - update uppercase alpha searches to something consistent with Tokenizer
+        private (string, string) getAttribute(byte[] bytes, int position) 
+        {
+            // 1
+            List<byte> pre = new List<byte> {0x09, 0x0A, 0x0C, 0x0D, 0x20, 0x2F};
+            List<byte> wspace = pre.GetRange(0, 5);
 
+            while (pre.Contains(bytes[position]) && position < bytes.Length) { position++; }
+
+            // 2
+            if (bytes[position] == 0x3E) { return ("", ""); }
+
+            // 3
+            StringBuilder attributeName, attributeValue;
+            attributeName = attributeValue = new StringBuilder();
+
+            
+            while (position < bytes.Length)
+            {
+                // 4
+                if (bytes[position] == 0x3D && attributeName.Length > 0)
+                {
+                    goto Value;
+                }
+                else if (wspace.Contains(bytes[position]))
+                {
+                    goto Spaces;
+                }
+                else if (bytes[position] == 0x2F || bytes[position] == 0x3E)
+                {
+                    return (attributeName.ToString(), "");
+                }
+                else if (bytes[position] > 0x40 && bytes[position] < 0x5B)
+                {
+                    attributeName.Append(0x20 + bytes[position]);
+                }
+                else
+                {
+                    attributeName.Append(bytes[position]);
+                }
+
+                // 5
+                position++;
+            }
+
+            // 6
+            Spaces:
+                while (wspace.Contains(bytes[position]) && position < bytes.Length) { position++; }
+
+            // 7
+            if (bytes[position] != 0x3D) { return (attributeName.ToString(), ""); }
+            
+            // 8
+            position++;
+
+            // 9
+            Value:
+                while (wspace.Contains(bytes[position]) && position < bytes.Length) { position++; }
+
+            // 10
+            if (bytes[position] == 0x22 || bytes[position] == 0x27)
+            {
+                // 10.1
+                byte b = bytes[position];
+
+                // 10.2
+                QuoteLoop:
+                    position++;
+
+                // 10.3
+                if (b == bytes[position]) 
+                { 
+                    return (attributeName.ToString(), attributeValue.ToString()); 
+                }
+
+                // 10.4
+                else if (bytes[position] > 0x40 && bytes[position] < 0x5B)
+                {
+                    attributeValue.Append(0x20 + bytes[position]);
+                }
+
+                // 10.5
+                else
+                {
+                    attributeValue.Append(bytes[position]);
+                }
+                
+                // 10.6
+                goto QuoteLoop;
+            }
+            else if (bytes[position] == 0x3E)
+            {
+                return (attributeName.ToString(), "");
+            }
+            else if (bytes[position] > 0x40 && bytes[position] < 0x5B)
+            {
+                attributeValue.Append(0x20 + bytes[position]);
+                position++;
+            }
+            else
+            {
+                attributeValue.Append(bytes[position]);
+                position++;
+            }
+
+            while (position < bytes.Length)
+            {
+                // 11
+                if (wspace.Contains(bytes[position]))
+                {
+                    return (attributeName.ToString(), attributeValue.ToString());
+                }
+                else if (bytes[position] > 0x40 && bytes[position] < 0x5B)
+                {
+                    attributeValue.Append(0x20 + bytes[position]);
+                }
+                else
+                {
+                    attributeValue.Append(bytes[position]);
+                }
+
+                // 12
+                position++;
+            }
+            
+            return (attributeName.ToString(), attributeValue.ToString());
+        }
+
+        // TODO: Parser.getXMLEncoding - implement an Encoding class
         public string? getXMLEncoding(byte[] bytes) 
         {
             // 1 
