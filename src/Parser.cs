@@ -286,7 +286,153 @@ namespace Luxor
             return (Encoding.UTF8, "irrelevant");            
         }
 
-        private void prescanByteStream(Int32 size) { throw new NotImplementedException(); }
+        // TODO: Parser.prescanByteStream - figure out how to gracefully exit all the searching while loops
+        // TODO: Parser.prescanByteStream - update alphanumeric and whitespace searches to something concise and consistent with Tokenizer
+        // end condition is automatically 1024 bytes
+        private string? prescanByteStream() 
+        {
+            // 1
+            // string? fallbackEncoding = null;
+
+            // 2
+            byte[] bytes = _stream.ExposeByteBuffer();
+            int position = 0;
+
+            // 3
+            ArraySegment<Byte> byteSegment = new ArraySegment<Byte>(bytes);
+
+            byte[] littleEndian = {0x3C, 0x0, 0x3F, 0x0, 0x78, 0x0};
+            if (byteSegment.Slice(position, littleEndian.Length).ToArray() == littleEndian)
+            {
+                return "UTF-16LE";
+            }
+
+            byte[] bigEndian = {0x0, 0x3C, 0x0, 0x3F, 0x0, 0x78};
+            if (byteSegment.Slice(position, bigEndian.Length).ToArray() == bigEndian)
+            {
+                return "UTF-16BE";
+            }
+
+            // 4
+            Loop:
+                
+                if (bytes[position] == 0x3C)
+                {
+                    position++;
+                    
+                    if (byteSegment.Slice(position, 3).ToArray() == new byte[] {0x21, 0x2D, 0x2D})
+                    {
+                        position++;
+                        byte[] sequence = {0x2D, 0x2D, 0x3E};
+
+                        while (byteSegment.Slice(position, sequence.Length) != sequence && position < bytes.Length) { position++; }
+                        position += 2;
+                    }
+                    else if (bytes[position] == 0x4D || bytes[position] == 0x6D)
+                    {
+                        List<byte> codepoints = new List<byte> {0x09, 0x0A, 0x0C, 0x0D, 0x20, 0x2F}; 
+                        if (
+                            (bytes[position + 1] == 0x45 || bytes[position + 1] == 0x65) &&
+                            (bytes[position + 2] == 0x54 || bytes[position + 2] == 0x74) &&
+                            (bytes[position + 3] == 0x41 || bytes[position + 3] == 0x61) &&
+                            codepoints.Contains(bytes[position + 4])
+                           )
+                        {
+                            // 4.1.1
+                            position += 4;
+
+                            // 4.1.2
+                            List<string> attributeList = new List<string>();
+
+                            // 4.1.3
+                            bool gotPragma = false;
+
+                            // 4.1.4
+                            bool? needPragma = null;
+
+                            // 4.1.5
+                            string? charset = null;
+
+                            // 4.1.6 + 4.1.10
+                            (string name, string value) attr = getAttribute(bytes, position);
+                            while (attr != ("", "")) 
+                            {
+                                // 4.1.7
+                                if (attributeList.Contains(attr.name)) { continue; }
+
+                                // 4.1.8
+                                attributeList.Append(attr.name);
+
+                                // 4.1.9
+                                if (attr.name == "http-equiv") 
+                                { 
+                                    gotPragma = true; 
+                                }
+                                else if (attr.name == "content") 
+                                {
+                                    // TODO: implement the algorithm for extracting a character encoding from a meta element
+                                    charset = new NotImplementedException().Message;
+                                    needPragma = true;
+                                }
+                                else if (attr.name == "charset")
+                                {
+                                    charset = getEncodingFromLabel(attr.value);
+                                    needPragma = true;
+                                }
+                            }
+
+                            // 4.1.11 + 4.1.12 + 4.1.13
+                            if (needPragma is null || (needPragma == true && !gotPragma) || charset is null)
+                            {
+                                goto NextByte;
+                            } 
+
+                            // 4.1.14
+                            if (charset == "UTF-16BE/LE")
+                            {
+                                charset = "UTF-8";
+                            }
+
+                            // 4.1.15
+                            if (charset == "x-user-defined")
+                            {
+                                charset = "windows-1252";
+                            }
+
+                            return charset;
+                        }
+                    }
+                    // TODO: this is wrong...
+                    else if (bytes[position] == 0x2F)
+                    {
+                        if ((bytes[position + 1] > 0x40 && bytes[position + 1] < 0x5B) || (bytes[position + 1] > 0x60 && bytes[position + 1] < 0x7B))
+                        {
+                            position += 3;
+                            List<byte> codepoints = new List<byte> {0x09, 0x0A, 0x0C, 0x0D, 0x20, 0x3E};
+
+                            // 4.2.1
+                            while (!codepoints.Contains(bytes[position]) && position < bytes.Length) { position++; }
+
+                            // 4.2.2
+                            (string, string)? attribute = getAttribute(bytes, position);
+                            while (attribute != ("", "")) { attribute = getAttribute(bytes, position); }
+
+                            goto NextByte;
+                        }
+                    }
+                    else if (bytes[position] == 0x21 || bytes[position] == 0x2F || bytes[position] == 0x3F)
+                    {
+                        while (bytes[position] != 0x3E && position < bytes.Length) { position++; }
+                    }
+                    
+                }
+
+            // 5
+            NextByte:
+                position++;
+                goto Loop;
+
+        }
 
         // TODO: Parser.getAttribute - figure out how to gracefully exit all the searching while loops
         // TODO: Parser.getAttribute - update uppercase alpha searches to something consistent with Tokenizer
@@ -511,6 +657,7 @@ namespace Luxor
 
         }
 
+        private string? getEncodingFromLabel(string str) => getEncodingFromLabel(str.ToCharArray());
         private string? getEncodingFromLabel(char[] chars)
         {
             // 1
