@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 
 using static Reference.DataTables;
@@ -11,11 +12,13 @@ namespace Luxor
         private Mode _mode;
         private Mode _orignalMode;
         private Stack<Mode> _templateModes;
+        private Mode _currentTemplateMode;
         private Document _document;
         private StreamReader _stream;
         private Tokenizer _tokenizer;
 
         private Stack<Element> _openElements = new Stack<Element>();
+        private Element _firstOpenElement;
         private Element? _currentNode;
         private Element? _adjustedCurrentNode;
 
@@ -28,6 +31,7 @@ namespace Luxor
         private bool _pause;
         private bool _scripting;
         private int _scriptNestingLevel;
+        private int _insertionPoint;
 
         private static Dictionary<string, string> _encodings = new Dictionary<string, string>{  	
             { "unicode-1-1-utf-8", "UTF-8" },
@@ -260,8 +264,8 @@ namespace Luxor
             { "x-user-defined", "x-user-defined" },
         };
         
-        protected Encoding Encoding { get; }
-        protected string Confidence { get; }
+        protected string Encoding { get; set; }
+        protected string Confidence { get; set; }
 
         public Parser (StreamReader sr)
         {
@@ -281,9 +285,9 @@ namespace Luxor
         // 13.2.3.2 Determining the Character Encoding
 
         // TODO: determineEncodings - allow for encodings other than UTF-8
-        private (Encoding, string) determineEncoding()
+        private (string, string) determineEncoding()
         {
-            return (Encoding.UTF8, "irrelevant");            
+            return ("UTF-8", "irrelevant");            
         }
 
         // TODO: Parser.prescanByteStream - figure out how to gracefully exit all the searching while loops
@@ -646,7 +650,7 @@ namespace Luxor
             }
 
             // 16
-            string? encoding = getEncodingFromLabel(Encoding.UTF8.GetChars(potentialEncoding));
+            string? encoding = "UTF-8"; // getEncodingFromLabel(Encoding.UTF8.GetChars(potentialEncoding));
             if (encoding is null) { return null; }
 
             // 17
@@ -671,19 +675,41 @@ namespace Luxor
             return encoding;
         }
 
-        // 12.2.3.4 Changing the Encoding While Parsing
-        private void changeEncoding() { throw new NotImplementedException(); }
+        // 13.2.3.4 Changing the Encoding While Parsing
+        private void changeEncoding(string newEncoding) {  
+            // 1
+            if (Encoding.Equals("UTF-16BE/LE"))
+            {
+                Confidence = "certain";
+                return;
+            }
+
+            // 2
+            if (newEncoding.Equals("UTF-16BE/LE")) { Encoding = "UTF-8"; }
+
+            // 3
+            if (newEncoding.Equals("x-user-defined")) { Encoding = "windows-1252"; }
+
+            // 4
+            if (newEncoding.Equals(Encoding)) 
+            {
+                Confidence = "certain";
+                return;
+            }
+
+            // 5
+            // TODO: Implement a Decoder class
+
+            // 6
+        }
 
         // 13.2.3.5 Preprocessing the Input Stream
         private char preprocess(Int32 next)
         {
-            // TODO: check for surrogate, non-char and control char parse errors
             
-            /*
-            if (surrogates.contains(next)) { surrogate-in-input-stream }
-            if (nonchars.contains(next)) { noncharacter-in-input-stream }
-            if (controls.contains(next)) { control-character-in-input-stream }
-            */
+            if (Char.IsSurrogate((char) next)) { /* surrogate-in-input-stream */ }
+            if (((char) next).IsNonCharacter()) { /* noncharacter-in-input-stream */ }
+            if (Char.IsControl((char) next) && !((char)next).IsAsciiWhiteSpace() && next != 0x0000) { /* control-character-in-input-stream */ }
 
             // normalize newlines
             if (next == 0x000D)
@@ -696,7 +722,65 @@ namespace Luxor
         }
 
         // 13.2.4.1 The Insertion Mode
-        private void resetMode() { throw new NotImplementedException(); }
+        private void resetMode() 
+        {
+            // 1
+            bool last = false;
+
+            // 2
+            Node node = _openElements.Peek();
+
+            // 3
+            Loop:
+                if (node)
+
+            // 4
+                // 4.1
+
+                // 4.2
+
+                // 4.3
+
+                // 4.4
+
+                // 4.5
+
+                // 4.6
+
+                // 4.7
+
+                // 4.8
+
+
+            // 5
+
+            // 6
+
+            // 7
+
+            // 8
+
+            // 9
+
+            // 10
+
+            // 11
+
+            // 12
+
+            // 13
+
+            // 14
+
+            // 15
+
+            // 16
+
+            // 17
+
+            // 18
+
+        }
 
         // 13.2.4.2 The Stack of Open Elements
         private void getScope() { throw new NotImplementedException(); }

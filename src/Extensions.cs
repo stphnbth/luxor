@@ -82,6 +82,16 @@ namespace Extensions
             if ((_charInfo[c] & 0x80) != 0) { return true; }
 
             return false;
-        }   
+        }  
+
+        // TODO: IsNonCharacter is meant for codepoints...
+        public static bool IsNonCharacter(this char c)
+        {
+            // U+FDD0 to U+FDEF
+            return c >= 0xFFD0 && c <= 0xFDEF; 
+
+            //  U+xxFFFE or U+xxFFFF
+
+        }
     }
 }
