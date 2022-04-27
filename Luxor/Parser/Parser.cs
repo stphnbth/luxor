@@ -5,7 +5,7 @@ using static Reference.DataTables;
 using Extensions;
 using Luxor.DOM;
 
-namespace Luxor
+namespace Luxor.Parser
 {
     public class Parser
     {
@@ -724,6 +724,7 @@ namespace Luxor
         // 13.2.4.1 The Insertion Mode
         private void resetMode() 
         {
+            /*
             // 1
             bool last = false;
 
@@ -732,25 +733,44 @@ namespace Luxor
 
             // 3
             Loop:
-                if (node)
+                if (node == _firstOpenElement) { last = true; }
+                // TODO: HTML fragment parsing algorithm
 
             // 4
+            if (node.GetType().Equals(typeof(HTMLSelectElement)))
+            {
                 // 4.1
+                if (last) { goto: Done; }
 
                 // 4.2
+                var ancestor = node;
 
                 // 4.3
+                InternalLoop:
+                    if (ancestor == _firstOpenElement) { goto: Done; }
 
                 // 4.4
 
+
                 // 4.5
+                if (ancestor.GetType().Equals(typeof(HTMLTemplateElement))) { goto: Done; }
 
                 // 4.6
+                if (ancestor.GetType().Equals(typeof(HTMLTableElement)))
+                {
+                    _mode = Mode.SelectInTable;
+                    return;
+                }
 
                 // 4.7
+                goto: InternalLoop;
 
                 // 4.8
+                Done:
+                    _mode = Mode.Select;
+                    return;
 
+            }
 
             // 5
 
@@ -779,6 +799,7 @@ namespace Luxor
             // 17
 
             // 18
+            */
 
         }
 

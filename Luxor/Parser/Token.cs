@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Luxor
+namespace Luxor.Parser
 {
     public class Token {
         private Type _type;

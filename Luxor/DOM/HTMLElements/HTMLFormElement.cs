@@ -1,3 +1,5 @@
+using Luxor.Parser;
+
 namespace Luxor.DOM
 {
     public class HTMLFormElement : HTMLElement

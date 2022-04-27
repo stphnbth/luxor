@@ -8,7 +8,7 @@ using System.Diagnostics;
 using Extensions;
 using static Reference.DataTables;
 
-namespace Luxor 
+namespace Luxor.Parser
 {
     public class Tokenizer
     {        
