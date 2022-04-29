@@ -6,8 +6,8 @@ namespace Luxor.Parser
     public class Parser
     {
         private StreamReader _stream;
-        private Tokenizer _tokenizer;
-        private TreeBuilder _treeBuilder;
+        private Tokenizer _tokenizer = new Tokenizer();
+        private TreeBuilder _treeBuilder = new TreeBuilder();
 
         private char _current;
         private char _next;
@@ -17,69 +17,50 @@ namespace Luxor.Parser
         public Parser (StreamReader sr)
         {
             _stream = sr;
-
             Encoding = new Encoding.Encoding("UTF-8", "irrelevant");
-            consume();
 
-
-            _tokenizer = new Tokenizer();
-            _treeBuilder = new TreeBuilder();            
-
-            
+            _current = (char) normalize(_stream.Read());
+            _next = (char) normalize(_stream.Read());
         }
 
         // 13.2.3.5 Preprocessing the Input Stream
         private void consume()
         {
             if (_tokenizer.Reconsume) { return; }
-
-            // if (_next is not null) { _current = _next; }
-   
-            _next = (char) _stream.Read();
             
-            if (Char.IsSurrogate(_next)) { /* surrogate-in-input-stream */ }
-            if ((_next).IsNonCharacter()) { /* noncharacter-in-input-stream */ }
-            if (Char.IsControl(_next) && !(_next).IsAsciiWhiteSpace() && _next != 0x0000) { /* control-character-in-input-stream */ }
-
-            // normalize newlines
-            if (_next == 0x000D)
-            {
-                if (_stream.Peek() == 0x000A) { _next = (char) _stream.Read(); }
-                else { _next = (char) 0x000A; }
-            }
+            _current = _next;
+            _next = (char) normalize(_stream.Read());
+            
+            /*
+            // TODO: error catching during preprocessing??
+            if (Char.IsSurrogate(_next)) {  surrogate-in-input-stream  }
+            if ((_next).IsNonCharacter()) {  noncharacter-in-input-stream  }
+            if (Char.IsControl(_next) && !(_next).IsAsciiWhiteSpace() && _next != 0x0000) {  control-character-in-input-stream  }
+            */            
         }
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        private Int32 normalize(Int32 cp)
+        {
+            if (cp == 0x000D)
+            {
+                if (_stream.Peek() == 0x000A) { cp = _stream.Read(); }
+                else { cp = 0x000A; }
+            }
+
+            return cp;
+        }
+
         public void run()
         {
-            while (!_stream.EndOfStream)
+            while (_stream.EndOfStream)
             {
-                
-                /*
-                switch (_mode)
+                _tokenizer.step(_current, _next);
+
+                if (_tokenizer.Emitted is not null)
                 {
-                    case Mode.Initial:
-                        // TODO: check for whitespace tokens
-                        if (token.Type == Type.Character)
-                        {
-                            
-                        }
-
-                        else if (token.Type == Type.Comment) { insertComment(token); }
-
-                        break;
-                    default:
-                        break;
+                    _treeBuilder.dispatch(_tokenizer.Emitted);
+                    _tokenizer.Emitted = null;
                 }
-                */
             }
         }
 

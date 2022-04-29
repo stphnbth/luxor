@@ -120,7 +120,7 @@ namespace Luxor.Parser
 
         
         // 13.2.6 Tree Construction
-        private void dispatch(Token token)
+        internal void dispatch(Token token)
         {
             // if the stack of open elements is empty
             if (_openElements.Count == 0)
