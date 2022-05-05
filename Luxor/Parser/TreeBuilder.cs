@@ -1,6 +1,6 @@
 using Luxor.DOM;
 
-using static Reference.DataTables;
+using static Data.DataTables;
 
 namespace Luxor.Parser
 {
@@ -123,23 +123,34 @@ namespace Luxor.Parser
         internal void dispatch(Token token)
         {
             // if the stack of open elements is empty
-            if (_openElements.Count == 0)
+            if (_openElements.Count == 0 || adjCheck(token) || token.TokenType == TokenType.EndOfFile)
             {
 
             }
 
+            
+        }
+
+        private bool adjCheck(Token token)
+        {
             // if the adjusted current node is an element in the HTML namespace
-            if (_adjustedCurrentNode.NamespaceURI == "http://www.w3.org/1999/xhtml")
-            {
-
-            }
+            if (_adjustedCurrentNode!.NamespaceURI == HTMLNamespace) { return true; }
 
             // if the adjusted current node is a MathML text integration point and the token is a start tag whose tag name is neither "mglyph" nor "malignmark"
             // if the adjusted current node is a MathML text integration point and the token is a character token
+            if (_adjustedCurrentNodeContains!)
             // if the adjusted current node is a MathML annotation-xml element and the token is a start tag whose tag name is "svg"
+            if (_adjustedCurrentNodeContains!)
+            
+            
             // if the adjusted current node is an HTML integration point and the token is a start tag
             // if the adjusted current node is an HTML integration point and the token is a character token
-            // if the token is an end-of-file token
+            if (_adjustedCurrentNodeContains!)
+            
+            
+
+
+            return false;
     
         }
 
@@ -148,7 +159,7 @@ namespace Luxor.Parser
         private Element createElementForToken(string nspace, Element intendedParent) { throw new NotImplementedException(); }
         private void insertForeignElement(string nspace, Token token) { throw new NotImplementedException(); }
 
-        private void insertHTMLElement(Token token) { insertForeignElement("http://www.w3.org/1999/xhtml", token); }
+        private void insertHTMLElement(Token token) { insertForeignElement(HTMLNamespace, token); }
 
         private void adjustMathMLAttribute(Token token) { throw new NotImplementedException(); }
         private void adjustSVGAttribute(Token token) { throw new NotImplementedException(); }

@@ -15,7 +15,8 @@ namespace Luxor.DOM
 
         internal string CharacterSet { get; }
 
-        public string DocumentURI { get => URL; } 
+        public string DocumentURI { get => URL; }
+        public string Type { get => _type; set => _type = value; }
 
         private enum DocumentReadyState
         {
@@ -54,9 +55,11 @@ namespace Luxor.DOM
         private readonly DocumentVisibilityState visibilityState;
         private string designMode;
 
-        // private readonly WindowProxy? defaultView;        
+        // private readonly WindowProxy? defaultView;
         // private EventHandler onreadystatechange;
         // private EventHandler onvisibilitychange;
+
+        internal string? BrowsingContext = null;
 
         public Document()
         {

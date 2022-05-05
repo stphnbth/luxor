@@ -1,3 +1,5 @@
+/*
+
 using NUnit.Framework;
 
 namespace Luxor.Tests;
@@ -15,3 +17,5 @@ public class Tests
         Assert.Pass();
     }
 }
+
+*/

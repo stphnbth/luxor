@@ -5,28 +5,33 @@ using System.Text;
 using System.Diagnostics;
 
 using Extensions;
-using static Reference.DataTables;
+using static Data.DataTables;
 
 namespace Luxor.DOM
 {
-    public interface Node
+    public abstract class Node
     {
-        protected string? BaseURI { get; }
-        protected List<Node>? ChildNodes { get; }
-        protected Node? FirstChild { get; }
-        protected bool IsConnected { get; }
-        protected Node? LastChild { get; }
-        protected Node? NextSibling { get; }
-        protected string? NodeName { get; }
-        protected NodeType NodeType { get; }
-        protected string? NodeValue { get; set; }
-        protected Document? OwnerDocument { get; }
-        protected Node? ParentNode { get; }
-        protected Element? ParentElement { get; }
-        protected Node? PreviousSibling { get; }
-        protected string? TextContent { get; set; }
+        protected Node(Document ownerDocument)
+        {
+            OwnerDocument = ownerDocument;
+        }
 
-        Node GetRootNode(bool composed)
+        protected internal string? BaseURI { get; }
+        protected internal List<Node>? ChildNodes { get; }
+        protected internal Node? FirstChild { get; }
+        protected internal bool IsConnected { get; }
+        protected internal Node? LastChild { get; }
+        protected internal Node? NextSibling { get; }
+        protected internal string? NodeName { get; }
+        protected internal NodeType NodeType { get; }
+        protected internal string? NodeValue { get; set; }
+        protected internal Document OwnerDocument { get; }
+        protected internal Node? ParentNode { get; }
+        protected internal Element? ParentElement { get; }
+        protected internal Node? PreviousSibling { get; }
+        protected internal string? TextContent { get; set; }
+
+        public Node GetRootNode(bool composed)
         {
             if (composed) {}    // TODO: RETURN SHADOW INCLUDING ROOT
 
@@ -38,65 +43,65 @@ namespace Luxor.DOM
             return result;
         }
 
-        bool HasChildNodes() => ChildNodes is not null && ChildNodes.Count > 0 ? true : false;
+        public bool HasChildNodes() => ChildNodes is not null && ChildNodes.Count > 0 ? true : false;
 
 
-        void Normalize()
+        public void Normalize()
         {
             throw new NotImplementedException();
         }
 
-        Node CloneNode(bool deep)
+        public Node CloneNode(bool deep)
         {
             throw new NotImplementedException();
         }
 
-        bool IsEqualNode(Node otherNode)
+        public bool IsEqualNode(Node otherNode)
         {
             throw new NotImplementedException();
         }
 
-        ushort CompareDocumentPosition(Node other)
+        public ushort CompareDocumentPosition(Node other)
         {
             throw new NotImplementedException();
         }
 
-        bool Contains(Node? other)
+        public bool Contains(Node? other)
         {
             throw new NotImplementedException();
         }
 
-        string LookupPrefix(string nspace)
+        public string? LookupPrefix(string nspace)
         {
             throw new NotImplementedException();
         }
 
-        string LookupNamespaceURI(string prefix)
+        public string LookupNamespaceURI(string prefix)
         {
             throw new NotImplementedException();
         }
 
-        string IsDefaultNamepsace(string nspace)
+        public string IsDefaultNamepsace(string nspace)
         {
             throw new NotImplementedException();
         }
 
-        Node InsertBefore(Node node, Node? child)
+        public Node InsertBefore(Node node, Node? child)
         {
             throw new NotImplementedException();
         }
 
-        Node AppendChild(Node node)
+        public Node AppendChild(Node node)
         {
             throw new NotImplementedException();
         }
 
-        Node ReplaceChild(Node node, Node child)
+        public Node ReplaceChild(Node node, Node child)
         {
             throw new NotImplementedException();
         }
 
-        Node RemoveChild(Node child)
+        public Node RemoveChild(Node child)
         {
             throw new NotImplementedException();
         }

@@ -1,7 +1,8 @@
 namespace Luxor.DOM
 {
-    public interface Attr : Node 
+    public class Attr : Node 
     {
+        public Attr(Document ownerDocument) : base(ownerDocument) {}
 
         protected string LocalName { get; }
         protected string Name { get; }

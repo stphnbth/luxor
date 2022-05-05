@@ -4,7 +4,7 @@ using System.Text;
 
 using System.Diagnostics;
 
-using static Reference.DataTables;
+using static Data.DataTables;
 
 namespace Luxor.DOM
 {

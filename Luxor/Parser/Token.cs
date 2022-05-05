@@ -3,17 +3,10 @@ using System.Text;
 namespace Luxor.Parser
 {
     public class Token {
-        private Type _type;
+        private TokenType _tokenType;
 
-        public Token(Type type) => _type = type;
-        public Type Type { get => _type; }
-
-        public void PrintToken()
-        {
-            StringBuilder ptstr = new StringBuilder(Type.ToString().ToUpper());
-            ptstr.Append(this.ToString());
-            System.Diagnostics.Debug.WriteLine(ptstr);
-        }
+        public Token(TokenType tokenType) => _tokenType = tokenType;
+        public TokenType TokenType { get => _tokenType; }
     }
 
     // DOCTYPE
@@ -24,9 +17,9 @@ namespace Luxor.Parser
         private StringBuilder? _sys;
         private bool forceQuirks = false;
 
-        public Doctype() : base(Type.DOCTYPE) => _name = new StringBuilder();
-        public Doctype(string name) : base(Type.DOCTYPE) => _name = new StringBuilder(name);
-        public Doctype(Int32 name) : base(Type.DOCTYPE) => _name = new StringBuilder(new String((char) name, 1));
+        public Doctype() : base(TokenType.DOCTYPE) => _name = new StringBuilder();
+        public Doctype(string name) : base(TokenType.DOCTYPE) => _name = new StringBuilder(name);
+        public Doctype(Int32 name) : base(TokenType.DOCTYPE) => _name = new StringBuilder(new String((char) name, 1));
 
         public StringBuilder Name { get => _name; }
         public StringBuilder Pub { get => _pub!; set => _pub = value; }
@@ -47,9 +40,9 @@ namespace Luxor.Parser
         private StringBuilder _name;
         List<(StringBuilder name, StringBuilder value)> _attributes = new List<(StringBuilder, StringBuilder)>();
 
-        public Tag(Type type) : base(type) => _name = new StringBuilder();
-        public Tag(Type type, string name) : base(type) => _name = new StringBuilder(name);
-        public Tag(Type type, Int32 name) : base(type) => _name = new StringBuilder(new String((char) name, 1));
+        public Tag(TokenType type) : base(type) => _name = new StringBuilder();
+        public Tag(TokenType type, string name) : base(type) => _name = new StringBuilder(name);
+        public Tag(TokenType type, Int32 name) : base(type) => _name = new StringBuilder(new String((char) name, 1));
 
         public bool SelfClosing { get => _selfClosing; set => _selfClosing = value; }
         public StringBuilder Name { get => _name; }
@@ -67,9 +60,9 @@ namespace Luxor.Parser
     {
         private StringBuilder _data;
 
-        public Text(Type type) : base(type) => _data = new StringBuilder();
-        public Text(Type type, string data) : base(type) => _data = new StringBuilder(data);
-        public Text(Type type, Int32 data) : base(type) => _data = new StringBuilder(new String((char) data, 1));
+        public Text(TokenType type) : base(type) => _data = new StringBuilder();
+        public Text(TokenType type, string data) : base(type) => _data = new StringBuilder(data);
+        public Text(TokenType type, Int32 data) : base(type) => _data = new StringBuilder(new String((char) data, 1));
 
         public StringBuilder Data { get => _data; }
 
@@ -85,13 +78,13 @@ namespace Luxor.Parser
     {
         private Int32 _bit;
 
-        public EndOfFile(Type type, Int32 bit) : base(type)
+        public EndOfFile(TokenType type, Int32 bit) : base(type)
         {
             _bit = bit;
         }
     }
 
-    public enum Type {
+    public enum TokenType {
         DOCTYPE,
         StartTag,
         EndTag,

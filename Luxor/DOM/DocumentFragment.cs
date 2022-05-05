@@ -2,13 +2,13 @@ using System.Diagnostics;
 
 namespace Luxor.DOM
 {
-    public class DocumentFragment // : Node
+    public class DocumentFragment : Node
     {
         protected Element Host { get; set; }
 
-        public DocumentFragment()
+        public DocumentFragment(Document? ownerDocument, Element host) : base(ownerDocument) 
         {
-            throw new NotImplementedException();
+            Host = host;
         }
     }
 }

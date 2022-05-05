@@ -36,7 +36,9 @@ namespace Extensions
             if (buffer is not null && index is not null)
             {
                 char[] charBuffer = (char[]) buffer.GetValue(sr)!;   
-                int low = (int) index.GetValue(sr)! - 1;
+                
+                // slice to include next char
+                int low = (int) index.GetValue(sr)! - 2; 
 
                 return charBuffer.Slice(low, low + size);
             }

@@ -2,8 +2,10 @@ using System.Diagnostics;
 
 namespace Luxor.DOM
 {
-    public interface CharacterData : Node 
+    public class CharacterData : Node 
     {
+        public CharacterData(Document ownerDocument) : base(ownerDocument) {}
+
         public string Data { get; set; }
         public int Length { get; }
 

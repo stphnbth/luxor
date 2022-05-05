@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-using static Reference.DataTables;
+using static Data.DataTables;
 
 namespace Luxor.Parser
 {
@@ -12,6 +12,7 @@ namespace Luxor.Parser
         private Queue<char> _buffer;
         private int _charRefCode;
         private bool _reconsume;
+        private string _toConsume;
 
         private Token? _emitted;        
 
@@ -20,18 +21,19 @@ namespace Luxor.Parser
         private Tag? _lastEmittedStartTag;
         private Text? _comment;
 
-        private static Text ExclamationToken = new Text(Type.Character, 0x0021);
-        private static EndOfFile EndOfFileToken = new EndOfFile(Type.EndOfFile, 0xFFFF);
-        private static Text GreaterThanToken = new Text(Type.Character, 0x003E);
-        private static Text HyphenMinusToken = new Text(Type.Character, 0x002D);
-        private static Text LessThanToken = new Text(Type.Character, 0x003C);
-        private static Text ReplacementToken = new Text(Type.Character, 0xFFFD);
-        private static Text RightSqBracketToken = new Text(Type.Character, 0x005D);
-        private static Text SolidusToken = new Text(Type.Character, 0x002F);
+        private static Text ExclamationToken = new Text(TokenType.Character, 0x0021);
+        private static EndOfFile EndOfFileToken = new EndOfFile(TokenType.EndOfFile, 0xFFFF);
+        private static Text GreaterThanToken = new Text(TokenType.Character, 0x003E);
+        private static Text HyphenMinusToken = new Text(TokenType.Character, 0x002D);
+        private static Text LessThanToken = new Text(TokenType.Character, 0x003C);
+        private static Text ReplacementToken = new Text(TokenType.Character, 0xFFFD);
+        private static Text RightSqBracketToken = new Text(TokenType.Character, 0x005D);
+        private static Text SolidusToken = new Text(TokenType.Character, 0x002F);
 
         internal State State { get => _state; set => _state = value; }
         internal bool Reconsume { get => _reconsume; set => _reconsume = value; }
         internal Token? Emitted { get => _emitted; set => _emitted = value; }
+        internal string ToConsume { get => _toConsume; set => _toConsume = value; }
 
         public Tokenizer () 
         {            
@@ -39,10 +41,11 @@ namespace Luxor.Parser
             _buffer = new Queue<char>();
 
             Reconsume = false;
+            ToConsume = String.Empty;
             Emitted = null;
         }
 
-        internal void step(int current, int next) 
+        internal void step(char current, char next, string? lookAhead = null) 
         { 
             switch (State) 
             {
@@ -57,10 +60,10 @@ namespace Luxor.Parser
                         State = State.TagOpen;
 
                     else if (current == 0x0000)
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
 
                     else 
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
                                         
                     break;
                 case State.RCDATA:
@@ -77,7 +80,7 @@ namespace Luxor.Parser
                         emit(ReplacementToken);
 
                     else
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
 
                     break;
                 case State.RAWTEXT:
@@ -88,7 +91,7 @@ namespace Luxor.Parser
                         emit(ReplacementToken);
 
                     else
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
 
                     break;
                 case State.ScriptData:
@@ -99,7 +102,7 @@ namespace Luxor.Parser
                         emit(ReplacementToken);
 
                     else
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
 
                     break;
                 case State.PLAINTEXT:
@@ -107,7 +110,7 @@ namespace Luxor.Parser
                         emit(ReplacementToken);
 
                     else
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
 
                     break;
                 case State.TagOpen:
@@ -117,16 +120,16 @@ namespace Luxor.Parser
                     else if (current == 0x002F)
                         State = State.EndTagOpen;
 
-                    else if (asciiAlpha.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsLetter(current))
                     {
-                        _currentTag = new Tag(Type.StartTag);
+                        _currentTag = new Tag(TokenType.StartTag);
                         Reconsume = true;
                         State = State.TagName;
                     }
 
                     else if (current == 0x003F)
                     {
-                        _comment = new Text(Type.Comment);
+                        _comment = new Text(TokenType.Comment);
                         Reconsume = true;
                         State = State.BogusComment;
                     }
@@ -140,9 +143,9 @@ namespace Luxor.Parser
 
                     break;
                 case State.EndTagOpen:
-                    if (asciiAlpha.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetter(current))
                     {
-                        _currentTag = new Tag(Type.EndTag);
+                        _currentTag = new Tag(TokenType.EndTag);
                         Reconsume = true;
                         State = State.TagName;
                     }
@@ -152,7 +155,7 @@ namespace Luxor.Parser
                     
                     else 
                     {
-                        _comment = new Text(Type.Comment);
+                        _comment = new Text(TokenType.Comment);
                         Reconsume = true;
                         State = State.BogusComment;
                     }
@@ -168,14 +171,14 @@ namespace Luxor.Parser
                     else if (current == 0x003E)
                         State = State.Data;
 
-                    else if (asciiAlphaUpper.Contains(current))
-                        _currentTag!.Name.Append((char) (current = 0x0020));
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
+                        _currentTag!.Name.Append(Char.ToLower(current));
 
                     else if (current == 0x0000)
-                        _currentTag!.Name.Append((char) 0xFFFD);
+                        _currentTag!.Name.Append(0xFFFD);
                     
                     else
-                        _currentTag!.Name.Append((char) current);
+                        _currentTag!.Name.Append(current);
 
                     break;
                 case State.RCDATALT:
@@ -194,9 +197,9 @@ namespace Luxor.Parser
 
                     break;
                 case State.RCDATAEndTagOpen:
-                    if (asciiAlpha.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetter(current))
                     {
-                        _currentTag = new Tag(Type.EndTag);
+                        _currentTag = new Tag(TokenType.EndTag);
                         Reconsume = true;
                         State = State.RCDATAEndTagName;
                     } 
@@ -223,16 +226,16 @@ namespace Luxor.Parser
                         emit(_currentTag!);
                     }
                     
-                    else if (asciiAlphaUpper.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
                     {
-                        _currentTag!.Name.Append((char) (current + 0x0020));
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(Char.ToLower(current));
+                        _buffer.Enqueue(current);
                     }
 
-                    else if (asciiAlphaLower.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsLower(current))
                     {
-                        _currentTag!.Name.Append((char) current);
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(current);
+                        _buffer.Enqueue(current);
                     }
 
                     else 
@@ -241,7 +244,7 @@ namespace Luxor.Parser
                         emit(SolidusToken);
                         
                         while (_buffer.Count > 0)
-                            emit(new Text(Type.Character, _buffer.Dequeue()));
+                            emit(new Text(TokenType.Character, _buffer.Dequeue()));
                         
                         Reconsume = true;
                         State = State.RCDATA;   
@@ -264,9 +267,9 @@ namespace Luxor.Parser
 
                     break;
                 case State.RAWTEXTEndTagOpen:
-                    if (asciiAlpha.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetter(current))
                     {
-                        _currentTag = new Tag(Type.EndTag);
+                        _currentTag = new Tag(TokenType.EndTag);
                         Reconsume = true;
                         State = State.RAWTEXTEndTagName;
                     }
@@ -293,17 +296,17 @@ namespace Luxor.Parser
                         emit(_currentTag!);
                     }
                         
-                    else if (asciiAlphaUpper.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
                     {
-                        _currentTag!.Name.Append((char) (current + 0x0020));
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(Char.ToLower(current));
+                        _buffer.Enqueue(current);
 
                     }
 
-                    else if (asciiAlphaLower.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsLower(current))
                     {
-                        _currentTag!.Name.Append((char) current);
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(current);
+                        _buffer.Enqueue(current);
 
                     }
 
@@ -313,7 +316,7 @@ namespace Luxor.Parser
                         emit(SolidusToken);
 
                         while (_buffer.Count > 0)
-                            emit(new Text(Type.Character, _buffer.Dequeue()));
+                            emit(new Text(TokenType.Character, _buffer.Dequeue()));
 
                         Reconsume = true;
                         State = State.RAWTEXT;
@@ -343,9 +346,9 @@ namespace Luxor.Parser
                     
                     break;
                 case State.ScriptDataEndTagOpen:
-                    if (asciiAlpha.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetter(current))
                     {
-                        _currentTag = new Tag(Type.EndTag);
+                        _currentTag = new Tag(TokenType.EndTag);
                         Reconsume = true;
                         State = State.ScriptDataEndTagName;
                     }
@@ -372,17 +375,17 @@ namespace Luxor.Parser
                         emit(_currentTag!);
                     }
                         
-                    else if (asciiAlphaUpper.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
                     {
-                        _currentTag!.Name.Append((char) (current + 0x0020));
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(Char.ToLower(current));
+                        _buffer.Enqueue(current);
 
                     }
 
-                    else if (asciiAlphaLower.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsLower(current))
                     {
-                        _currentTag!.Name.Append((char) current);
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(current);
+                        _buffer.Enqueue(current);
 
                     }
 
@@ -392,7 +395,7 @@ namespace Luxor.Parser
                         emit(SolidusToken);
 
                         while (_buffer.Count > 0)
-                            emit(new Text(Type.Character, _buffer.Dequeue()));
+                            emit(new Text(TokenType.Character, _buffer.Dequeue()));
 
                         Reconsume = true;
                         State = State.ScriptData;
@@ -441,7 +444,7 @@ namespace Luxor.Parser
                         emit(ReplacementToken);
 
                     else
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
                     
                     break;
                 case State.ScriptDataEscapedDash:
@@ -463,7 +466,7 @@ namespace Luxor.Parser
                     else
                     {
                         State = State.ScriptDataEscaped;
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
                     }
                     
                     break;
@@ -489,7 +492,7 @@ namespace Luxor.Parser
                     else
                     {
                         State = State.ScriptDataEscaped;
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
                     }
                     break;
                 case State.ScriptDataEscapedLT:
@@ -499,7 +502,7 @@ namespace Luxor.Parser
                         State = State.ScriptDataEscapedEndTagOpen;
                     }
 
-                    if (asciiAlpha.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetter(current))
                     {
                         _buffer.Clear();
                         emit(LessThanToken);
@@ -517,9 +520,9 @@ namespace Luxor.Parser
 
                     break;
                 case State.ScriptDataEscapedEndTagOpen:
-                    if (asciiAlpha.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetter(current))
                     {
-                        _currentTag = new Tag(Type.EndTag);
+                        _currentTag = new Tag(TokenType.EndTag);
                         Reconsume = true;
                         State = State.ScriptDataEscapedEndTagName;
                     }
@@ -546,16 +549,16 @@ namespace Luxor.Parser
                         emit(_currentTag!);
                     }
                         
-                    else if (asciiAlphaUpper.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
                     {
-                        _currentTag!.Name.Append((char) (current + 0x0020));
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(Char.ToLower(current));
+                        _buffer.Enqueue(current);
                     }
 
-                    else if (asciiAlphaLower.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsLower(current))
                     {
-                        _currentTag!.Name.Append((char) current);
-                        _buffer.Enqueue((char) current);
+                        _currentTag!.Name.Append(current);
+                        _buffer.Enqueue(current);
 
                     }
 
@@ -565,7 +568,7 @@ namespace Luxor.Parser
                         emit(SolidusToken);
 
                         while (_buffer.Count > 0)
-                            emit(new Text(Type.Character, _buffer.Dequeue()));
+                            emit(new Text(TokenType.Character, _buffer.Dequeue()));
 
                         Reconsume = true;
                         State = State.ScriptDataEscaped;
@@ -585,20 +588,20 @@ namespace Luxor.Parser
                         else
                         {
                             State = State.ScriptDataEscaped;
-                            emit(new Text(Type.Character, current));
+                            emit(new Text(TokenType.Character, current));
                         }
                     }
 
-                    else if (asciiAlphaUpper.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
                     {
-                        _buffer.Enqueue((char) (current + 0x0020));
-                        emit(new Text(Type.Character, current));
+                        _buffer.Enqueue(Char.ToLower(current));
+                        emit(new Text(TokenType.Character, current));
                     }
 
-                    else if (asciiAlphaLower.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsLower(current))
                     {
-                        _buffer.Enqueue((char) current);
-                        emit(new Text(Type.Character, current));
+                        _buffer.Enqueue(current);
+                        emit(new Text(TokenType.Character, current));
                     }
 
                     else
@@ -625,7 +628,7 @@ namespace Luxor.Parser
                         emit(ReplacementToken);
 
                     else
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
 
                     break;
                 case State.ScriptDataDoubleEscapedDash:
@@ -650,7 +653,7 @@ namespace Luxor.Parser
                     else
                     {
                         State = State.ScriptDataDoubleEscaped;
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
                     }
 
                     break;
@@ -679,7 +682,7 @@ namespace Luxor.Parser
                     else
                     {
                         State = State.ScriptDataDoubleEscaped;
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
                     }
 
                     break;
@@ -711,20 +714,20 @@ namespace Luxor.Parser
                         else
                         {
                             State = State.ScriptDataEscaped;
-                            emit(new Text(Type.Character, current));
+                            emit(new Text(TokenType.Character, current));
                         }
                     }
 
-                    else if (asciiAlphaUpper.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
                     {
-                        _buffer.Enqueue((char) (current + 0x0020));
-                        emit(new Text(Type.Character, current));
+                        _buffer.Enqueue(Char.ToLower(current));
+                        emit(new Text(TokenType.Character, current));
                     }
 
-                    else if (asciiAlphaLower.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsLower(current))
                     {
-                        _buffer.Enqueue((char) current);
-                        emit(new Text(Type.Character, current));
+                        _buffer.Enqueue(current);
+                        emit(new Text(TokenType.Character, current));
                     }
 
                     else
@@ -768,8 +771,8 @@ namespace Luxor.Parser
                     else if (current == 0x003D)
                         State = State.BeforeAttributeValue;
                     
-                    else if (asciiAlphaUpper.Contains(current))
-                        appendCharToAttributeName((current += 0x0020));
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
+                        appendCharToAttributeName(Char.ToLower(current));
 
                     else if (current == 0x0000)
                         appendCharToAttributeName(0xFFFD);
@@ -932,33 +935,32 @@ namespace Luxor.Parser
                     }
 
                     else if (current == 0x0000)
-                        _comment!.Data.Append((char) 0xFFFD);
+                        _comment!.Data.Append(0xFFFD);
 
                     else
-                        _comment!.Data.Append((char) current);
+                        _comment!.Data.Append(current);
 
                     break;
                 case State.MarkupDeclarationOpen:
-                    // TODO: TOKENIZER - MarkupDeclarationOpen -> consuming multiple characters
-                    /*
-                    if (lookAhead("--", StringComparison.Ordinal)) 
+                    if (lookAhead!.Substring(0, 2).Equals("--", StringComparison.Ordinal)) 
                     {
-                        (current, next) = consumeCharacters("--", current, next);
-                        _comment = new Text(Type.Comment);
+                        ToConsume = "--";
+                        _comment = new Text(TokenType.Comment);
                         State = State.CommentStart;
                     }
 
-                    else if (lookAhead("DOCTYPE", StringComparison.OrdinalIgnoreCase))
+                    else if (lookAhead!.Substring(0, 7).Equals("DOCTYPE", StringComparison.OrdinalIgnoreCase))
                     {
-                        (current, next) = consumeCharacters("DOCTYPE", current, next);
+                        ToConsume = "DOCTYPE";
                         State = State.DOCTYPE;
                     }
 
-                    else if (lookAhead("[CDATA[", StringComparison.Ordinal))
+                    else if (lookAhead!.Substring(0, 7).Equals("[CDATA[", StringComparison.Ordinal))
                     {
-                        (current, next) = consumeCharacters("[CDARA[", current, next);
-
+                        ToConsume = "[CDATA[";
                         
+                        /* 
+                        // TODO - CDATA LookAhead
                         var node = adjustCurrentNode();
                         if (node & !_htmlNamespace.Contains(node)) 
                             _state = State.CDATASection;
@@ -971,14 +973,15 @@ namespace Luxor.Parser
                         
 
                         State = State.CDATASection;
+                        */
                     }
 
                     else
                     {
-                        _comment = new Text(Type.Comment);
+                        _comment = new Text(TokenType.Comment);
                         State = State.BogusComment;
                     }
-                    */
+
                     break;
                 case State.CommentStart:
                     if (current == 0x002D)
@@ -1018,7 +1021,7 @@ namespace Luxor.Parser
                 case State.Comment:
                     if (current == 0x003C)
                     {
-                        _comment!.Data.Append((char) current);
+                        _comment!.Data.Append(current);
                         State = State.CommentLT;
                     }
 
@@ -1026,21 +1029,21 @@ namespace Luxor.Parser
                         State = State.CommentEndDash;
 
                     else if (current == 0x0000)
-                        _comment!.Data.Append((char) 0xFFFD);
+                        _comment!.Data.Append(0xFFFD);
 
                     else
-                        _comment!.Data.Append((char) current);
+                        _comment!.Data.Append(current);
 
                     break;
                 case State.CommentLT:
                     if (current == 0x0021)
                     {
-                        _comment!.Data.Append((char) current);
+                        _comment!.Data.Append(current);
                         State = State.CommentLTBang;
                     }
 
                     else if (current == 0x003C)
-                        _comment!.Data.Append((char) current);
+                        _comment!.Data.Append(current);
 
                     else
                     {
@@ -1112,7 +1115,7 @@ namespace Luxor.Parser
 
                     else
                     {
-                        _comment!.Data.Append(new[] {(char) 0x002D, (char) 0x002D});
+                        _comment!.Data.Append(new[] {0x002D, 0x002D});
                         Reconsume = true;
                         State = State.Comment;
                     }
@@ -1160,9 +1163,9 @@ namespace Luxor.Parser
                     if (commonWhitespace.Contains(current))
                         break;
 
-                    else if (asciiAlphaUpper.Contains(current))
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
                     {
-                        _doctype = new Doctype(current + 0x0020);
+                        _doctype = new Doctype(Char.ToLower(current));
                         State = State.DOCTYPEName;
                     }
 
@@ -1197,14 +1200,14 @@ namespace Luxor.Parser
                         emit(_doctype!);
                     }
 
-                    else if (asciiAlphaUpper.Contains(current))
-                        _doctype!.Name.Append((char) current);
+                    else if (Char.IsAscii(current) && Char.IsUpper(current))
+                        _doctype!.Name.Append(current);
 
                     else if (current == 0x0000)
-                        _doctype!.Name.Append((char) 0xFFFD);
+                        _doctype!.Name.Append(0xFFFD);
 
                     else
-                        _doctype!.Name.Append((char) current);
+                        _doctype!.Name.Append(current);
 
                     break;
                 case State.AfterDOCTYPEName:
@@ -1219,17 +1222,15 @@ namespace Luxor.Parser
 
                     else
                     {
-                        /*
-                        TODO: TOKENIZER - AfterDOCTYPEName
-                        if (lookAhead("PUBLIC", StringComparison.OrdinalIgnoreCase))
+                        if (lookAhead!.Substring(0, 6).Equals("PUBLIC", StringComparison.OrdinalIgnoreCase))
                         {
-                            (current, next) = consumeCharacters("PUBLIC", current, next);  
+                            ToConsume = "PUBLIC";  
                             State = State.AfterDOCTYPEPubKey;
                         }
 
-                        else if (lookAhead("SYSTEM", StringComparison.Ordinal))
+                        else if (lookAhead!.Substring(0, 6).Equals("SYSTEM", StringComparison.Ordinal))
                         {
-                            (current, next) = consumeCharacters("SYSTEM", current, next);  
+                            ToConsume = "SYSTEM";  
                             State = State.AfterDOCTYPESysKey;
                         }
 
@@ -1239,7 +1240,6 @@ namespace Luxor.Parser
                             Reconsume = true;
                             State = State.BogusDOCTYPE;
                         }
-                        */
                     }
 
                     break;
@@ -1310,7 +1310,7 @@ namespace Luxor.Parser
                         State = State.AfterDOCTYPEPubId;
 
                     else if (current == 0x0000)
-                        _doctype!.Pub.Append((char) 0xFFFD);
+                        _doctype!.Pub.Append(0xFFFD);
 
                     else if (current == 0x003E)
                     {
@@ -1320,7 +1320,7 @@ namespace Luxor.Parser
                     }
 
                     else
-                        _doctype!.Pub.Append((char) current);
+                        _doctype!.Pub.Append(current);
 
                     break;
                 case State.DOCTYPEPubIdSQ:
@@ -1328,7 +1328,7 @@ namespace Luxor.Parser
                         State = State.AfterDOCTYPEPubId;
 
                     else if (current == 0x0000)
-                        _doctype!.Pub.Append((char) 0xFFFD);
+                        _doctype!.Pub.Append(0xFFFD);
 
                     else if (current == 0x003E)
                     {
@@ -1338,7 +1338,7 @@ namespace Luxor.Parser
                     }
 
                     else
-                        _doctype!.Pub.Append((char) current);
+                        _doctype!.Pub.Append(current);
 
                     break;
                 case State.AfterDOCTYPEPubId:
@@ -1468,7 +1468,7 @@ namespace Luxor.Parser
                         State = State.AfterDOCTYPESysId;
                     
                     else if (current == 0x0000)
-                        _doctype!.Sys.Append((char) 0xFFFD);
+                        _doctype!.Sys.Append(0xFFFD);
 
                     else if (current == 0x003E)
                     {
@@ -1478,7 +1478,7 @@ namespace Luxor.Parser
                     }
 
                     else
-                        _doctype!.Sys.Append((char) current);
+                        _doctype!.Sys.Append(current);
 
                     break;
                 case State.DOCTYPESysIdSQ:
@@ -1486,7 +1486,7 @@ namespace Luxor.Parser
                         State = State.AfterDOCTYPESysId;
                     
                     else if (current == 0x0000)
-                        _doctype!.Sys.Append((char) 0xFFFD);
+                        _doctype!.Sys.Append(0xFFFD);
 
                     else if (current == 0x003E)
                     {
@@ -1496,7 +1496,7 @@ namespace Luxor.Parser
                     }
 
                     else
-                        _doctype!.Sys.Append((char) current);
+                        _doctype!.Sys.Append(current);
 
                     break;
                 case State.AfterDOCTYPESysId:
@@ -1532,7 +1532,7 @@ namespace Luxor.Parser
                         State = State.CDATASectionBracket;
 
                     else
-                        emit(new Text(Type.Character, current));
+                        emit(new Text(TokenType.Character, current));
 
                     break;
                 case State.CDATASectionBracket:
@@ -1567,7 +1567,7 @@ namespace Luxor.Parser
                     _buffer.Clear();
                     _buffer.Enqueue((char) 0x0026);
 
-                    if (asciiAlphanumeric.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetterOrDigit(current))
                     {
                         Reconsume = true;
                         State = State.NamedCharRef;
@@ -1575,7 +1575,7 @@ namespace Luxor.Parser
 
                     else if (current == 0x0023)
                     {
-                        _buffer.Enqueue((char) current);
+                        _buffer.Enqueue(current);
                         State = State.NumCharRef;
                     }
 
@@ -1592,7 +1592,7 @@ namespace Luxor.Parser
                     // always enter from State.CharRef when _reconsume is true
                     // filter down to a smaller and smaller collection because it's easier to implement
                     char[] carr = new char[_buffer.Count + 1];
-                    carr[_buffer.Count] = (char) current;
+                    carr[_buffer.Count] = current;
                     _buffer.CopyTo(carr, 0);
 
                     StringBuilder toMatch = new StringBuilder(new String(carr));
@@ -1602,12 +1602,12 @@ namespace Luxor.Parser
 
                     while(filtered.Count > 0)
                     {
-                        toMatch.Append((char) next);
+                        toMatch.Append(next);
                         
                         filtered = filtered.Where(x => x.StartsWith(toMatch.ToString())).ToList();
                         if (filtered.Count > 0)
                         {
-                            _buffer.Enqueue((char) current);
+                            _buffer.Enqueue(current);
                             match = filtered[0];
                         }                            
                     }
@@ -1615,7 +1615,7 @@ namespace Luxor.Parser
                     if (match is not null)
                     {
                         bool asAttribute = _return == State.AttributeValueDQ || _return == State.AttributeValueSQ || _return == State.AttributeValueUQ;
-                        if (asAttribute && !match.EndsWith(';') && (next == 0x003D || asciiAlphanumeric.Contains(next)))
+                        if (asAttribute && !match.EndsWith(';') && (next == 0x003D || (Char.IsAscii(next) && Char.IsLetterOrDigit(next))))
                         {
                             flushCodePoints();
                             State = _return;
@@ -1658,13 +1658,13 @@ namespace Luxor.Parser
                     
                     break;
                 case State.AmbiguousAmpersand:
-                    if (asciiAlphanumeric.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsLetterOrDigit(current))
                     {
                         if (_return == State.AttributeValueDQ || _return == State.AttributeValueSQ || _return == State.AttributeValueUQ)
                             appendCharToAttributeValue(current);
 
                         else 
-                            emit(new Text(Type.Character, current));
+                            emit(new Text(TokenType.Character, current));
                     }
 
                     else if (current == 0x003B)
@@ -1684,7 +1684,7 @@ namespace Luxor.Parser
                     _charRefCode = 0;
                     if (current == 0x0078 || current == 0x0058)
                     {
-                        _buffer.Enqueue((char) current);
+                        _buffer.Enqueue(current);
                         State = State.HexCharRefStart;
                     }
 
@@ -1711,7 +1711,7 @@ namespace Luxor.Parser
 
                     break;
                 case State.DecCharRefStart:
-                    if (asciiDigit.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsDigit(current))
                     {
                         Reconsume = true;
                         State = State.DecCharRef;
@@ -1726,7 +1726,7 @@ namespace Luxor.Parser
 
                     break;
                 case State.HexCharRef:
-                    if (asciiDigit.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsDigit(current))
                         _charRefCode = (_charRefCode * 16) + (current - 0x0030);
 
                     else if (asciiUpperHexDigit.Contains(current))
@@ -1746,7 +1746,7 @@ namespace Luxor.Parser
 
                     break;
                 case State.DecCharRef:
-                    if (asciiDigit.Contains(current))
+                    if (Char.IsAscii(current) && Char.IsDigit(current))
                         _charRefCode = (_charRefCode * 10) + (current - 0x0030);
 
                     else if (current == 0x003B)
@@ -1800,24 +1800,12 @@ namespace Luxor.Parser
             _currentTag.Attributes[length - 1].value.Append((char) character);
         }        
 
-        /*
-        private (Int32, Int32) consumeCharacters(string match, Int32 current, Int32 next)
-        {
-            current = next;
-
-            for (int i = 0; i < match.Length - 1; i++)
-                current = _stream.Read();
-            
-            return (current, _stream.Read());
-        }
-        */
-
         private void emit(Token token) 
         {
-            if (token.Type == Type.StartTag)
+            if (token.TokenType == TokenType.StartTag)
                 _lastEmittedStartTag = (Tag) token;
 
-            token.PrintToken();
+            Emitted = token;
         }
 
         private void flushCodePoints()
@@ -1828,7 +1816,7 @@ namespace Luxor.Parser
                 if (asAttribute)
                     appendCharToAttributeValue(_buffer.Dequeue());
                 else
-                    emit(new Text(Type.Character, _buffer.Dequeue()));
+                    emit(new Text(TokenType.Character, _buffer.Dequeue()));
             }
         }
 
@@ -1841,12 +1829,6 @@ namespace Luxor.Parser
         }
         
         /*
-        private bool lookAhead(string toMatch, StringComparison comparisonType)
-        {
-            StringBuilder match = new StringBuilder(new String(_stream.ExposeCharBuffer(toMatch.Length)));
-            return toMatch.Equals(match.ToString(), comparisonType);
-        }
-        
         private void runEOF()
         {
             if (State == State.TagOpen)

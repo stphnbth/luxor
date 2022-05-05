@@ -1,12 +1,11 @@
 using System.Text.Json;
 
-namespace Reference
+namespace Data
 {
     public class DataTables
     {
         public static readonly Dictionary<string, (List<Int32>, string)> entities;
         public static readonly Dictionary<Int32, string> codes;
-
         
         // TODO: replace ascii lists and migrate to bit manipulation
         public static readonly List<Int32> asciiWhitespace;
@@ -23,13 +22,49 @@ namespace Reference
         public static readonly List<Int32> asciiLowerHexDigit;
         public static readonly List<Int32> asciiHexDigit;
 
+        // Luxor
+        public static string HTMLNamespace => "http://www.w3.org/1999/xhtml";
+
+        // DOM.Element.cs
+        public static List<string> ValidLocalNames => new List<string> {
+            "article",
+            "aside",
+            "blockquote",
+            "body",
+            "div",
+            "footer",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "header",
+            "main",
+            "nav",
+            "p",
+            "section",
+            "span" 
+        };
+
+        public static List<string> InvalidCustomElementNames => new List<string> {
+            "annotation-xml",
+            "color-profile",
+            "font-face",
+            "font-face-src",
+            "font-face-uri",
+            "font-face-format",
+            "font-face-name",
+            "missing-glyph",
+        };
+
         static DataTables()
         {
             byte[] bytes;
             Utf8JsonReader reader;
 
             string file, path;
-            string dir = "src/data";
+            string dir = "Data";
                
             // ENTITIES
             file = "entities.json";

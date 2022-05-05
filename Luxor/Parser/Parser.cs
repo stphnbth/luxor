@@ -1,6 +1,8 @@
 using Extensions;
 using Luxor.DOM;
 
+using static Data.DataTables;
+
 namespace Luxor.Parser
 {
     public class Parser
@@ -24,11 +26,20 @@ namespace Luxor.Parser
         }
 
         // 13.2.3.5 Preprocessing the Input Stream
-        private void consume()
+        private void consume(string toConsume)
         {
             if (_tokenizer.Reconsume) { return; }
-            
+
             _current = _next;
+
+            if (!String.IsNullOrEmpty(toConsume))
+            {
+                for (int i = 0; i < toConsume.Length - 1; i++)
+                    _current = (char) normalize(_stream.Read());
+
+                _tokenizer.ToConsume = String.Empty;
+            }
+            
             _next = (char) normalize(_stream.Read());
             
             /*
@@ -52,15 +63,26 @@ namespace Luxor.Parser
 
         public void run()
         {
-            while (_stream.EndOfStream)
+            while (!_stream.EndOfStream)
             {
-                _tokenizer.step(_current, _next);
+    
+                if (_tokenizer.State == State.MarkupDeclarationOpen || _tokenizer.State == State.AfterDOCTYPEName)
+                {
+                    string lookAhead = new String(_stream.ExposeCharBuffer(8));
+                    _tokenizer.step(_current, _next, lookAhead);
+                }
+                else 
+                {
+                    _tokenizer.step(_current, _next);
+                }
 
                 if (_tokenizer.Emitted is not null)
                 {
                     _treeBuilder.dispatch(_tokenizer.Emitted);
                     _tokenizer.Emitted = null;
                 }
+
+                consume(_tokenizer.ToConsume);
             }
         }
 
