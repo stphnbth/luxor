@@ -2,7 +2,7 @@ using static Data.DataTables;
 
 namespace Luxor.DOM
 {
-    public class CustomElement
+    public class CustomElementDefinition
     {
         private string _name;
         private string _localName;
@@ -14,22 +14,26 @@ namespace Luxor.DOM
         private bool _disableInternals;
         private bool _disableShadow;
 
+        internal string Name { get => _name; }
+        internal string LocalName { get => _localName; }
+        internal CustomElementConstructor CustomElementConstructor { get => _customElementConstructor; set => _customElementConstructor = value; }
+
         public bool DisableShadow { get => _disableShadow; set => _disableShadow = value; }
 
-        public static CustomElement? LookUp(Document document, string nspace, string localName, string? isValue)
+        public static CustomElementDefinition? LookUp(Document document, string? nspace, string localName, string? isValue)
         {
             // 1, 2
-            if (nspace != HTMLNamespace || document.BrowsingContext is null) { return null; }
+            if ((nspace is not null && nspace != HTMLNamespace) || document.BrowsingContext is null) { return null; }
 
             // 3 TODO: empty CustomElementRegistry
             CustomElementRegistry registry = new CustomElementRegistry();
 
             // 4, 5
-            foreach (CustomElement definition in registry.Definitions)
+            foreach (CustomElementDefinition definition in registry.Definitions)
             {
                 if (definition._localName == localName)
                 {
-                    if (definition._name == localName || definition._name  == isValue)
+                    if (definition.Name == localName || definition.Name  == isValue)
                     {
                         return definition;
                     }
@@ -42,11 +46,11 @@ namespace Luxor.DOM
 
     public class CustomElementRegistry
     {
-        private List<CustomElement> _definitions;
+        private List<CustomElementDefinition> _definitions;
         private bool _definitionIsRunning;
         private Dictionary<string, Task> _whenDefinedMap;
 
-        public List<CustomElement> Definitions { get => _definitions; set => _definitions = value; }
+        public List<CustomElementDefinition> Definitions { get => _definitions; set => _definitions = value; }
         public bool DefinitionIsRunning { get => _definitionIsRunning; set => _definitionIsRunning = value; }
         public Dictionary<string, Task> WhenDefinedMap { get => _whenDefinedMap; set => _whenDefinedMap = value; }
 

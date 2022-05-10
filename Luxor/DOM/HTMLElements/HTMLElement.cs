@@ -36,4 +36,9 @@ namespace Luxor.DOM
             throw new NotImplementedException();
         }
     }
+
+    public class HTMLUnknownElement : HTMLElement
+    {
+        
+    }
 }
