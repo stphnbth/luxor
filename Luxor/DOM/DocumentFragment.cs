@@ -4,11 +4,20 @@ namespace Luxor.DOM
 {
     public class DocumentFragment : Node
     {
-        protected Element Host { get; set; }
+        // PRIVATE FIELDS
+        private Element _host;
 
-        public DocumentFragment(Document? ownerDocument, Element host) : base(ownerDocument) 
+        // INTERNAL PROPERTIES
+        internal Element Host { get => _host; set => _host = value; }
+
+        // PUBLIC OVERRIDES
+        public override string NodeName { get => "#document-fragment"; }
+        public override string? TextContent { get => GetDescendantText(); set => StringReplaceAll(value); }
+
+        // CONSTRUCTOR
+        public DocumentFragment(Document nodeDocument, Element host) : base(nodeDocument)
         {
-            Host = host;
+            _host = host;
         }
     }
 }

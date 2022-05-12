@@ -8,26 +8,19 @@ using static Data.DataTables;
 
 namespace Luxor.DOM
 {
-    public class DocumentType // : Node
+    public class DocumentType : Node
     {
-        protected string? PubID { get; }
-        protected string? SysID { get; }
+        private string _name;
+        private string _publicID;
+        private string _systemID;
 
-        public DocumentType() { }
+        public string Name { get => _name; }
+        public string PublicID { get => _publicID; }
+        public string SystemID { get => _systemID; }
 
-        public DocumentType(string name, string pubID = "", string sysID = "")
-        {
-            /*
-            Type = NodeType.DocumentType;
-            Name = name;
-            */
-            
-            if (!pubID.Equals(""))
-                PubID = pubID;
+        public override string NodeName { get => Name; }
 
-            if (!sysID.Equals(""))
-                SysID = sysID;
-        }
+        public DocumentType(Document ownerDocument) : base(ownerDocument) {}
     }
 
     

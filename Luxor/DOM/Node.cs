@@ -11,36 +11,119 @@ namespace Luxor.DOM
 {
     public abstract class Node
     {
-        protected Node(Document ownerDocument)
+        // PRIVATE FIELDS
+        private Document _document;
+
+        private NodeType _type;
+        private string _name;
+        private string _baseURI;
+        private bool _isConnected;
+        private Node? _parentNode;
+        private Element? _parentElement;
+        private List<Node>? _children;
+        private Node? _firstChild;
+        private Node? _lastChild;
+        private Node? _previousSibling;
+        private Node? _nextSibling;
+
+        // PROTECTED PROPERTIES
+        protected Document NodeDocument { get => _document; set => _document = value; }
+
+        // PUBLIC PROPERTIES
+        public NodeType NodeType { get => _type; }
+        public string? BaseURI { get => NodeDocument.BaseURL; } // TODO: serialize URL's
+
+        public bool IsConnected
         {
-            OwnerDocument = ownerDocument;
+            get
+            {
+                Node root = GetRoot();
+
+                throw new NotImplementedException();
+            }
         }
 
-        protected internal string? BaseURI { get; }
-        protected internal List<Node>? ChildNodes { get; }
-        protected internal Node? FirstChild { get; }
-        protected internal bool IsConnected { get; }
-        protected internal Node? LastChild { get; }
-        protected internal Node? NextSibling { get; }
-        protected internal string? NodeName { get; }
-        protected internal NodeType NodeType { get; }
-        protected internal string? NodeValue { get; set; }
-        protected internal Document OwnerDocument { get; }
-        protected internal Node? ParentNode { get; }
-        protected internal Element? ParentElement { get; }
-        protected internal Node? PreviousSibling { get; }
-        protected internal string? TextContent { get; set; }
+        public Document? OwnerDocument { get => (NodeType == NodeType.Document) ? null : _document; }
+        public Node? ParentNode { get => _parentNode; }
+        public Element? ParentElement { get => _parentElement; }
 
-        public Node GetRootNode(bool composed)
+        // TODO: node children are parsed and filtered, I think....
+        public List<Node>? ChildNodes { get => _children; }
+
+        public Node? FirstChild
         {
-            if (composed) {}    // TODO: RETURN SHADOW INCLUDING ROOT
+            get
+            {
+                if (_children is null) { return null; }
+                return _children[0];
+            }
+        }
 
+        public Node? LastChild
+        {
+            get
+            {
+                if (_children is null) { return null; }
+                return _children[_children.Count - 1];
+            }
+        }
+
+        public Node? PreviousSibling { get => _previousSibling; }
+        public Node? NextSibling { get => _nextSibling; }
+
+        // VIRTUAL PROPERTIES
+        public virtual string NodeName { get => _name; }
+
+        public virtual string? NodeValue
+        {
+            get { return null; }
+            set {}
+        }
+
+        public virtual string? TextContent
+        {
+            get { return null; }
+            set {}
+        }
+
+        // CONSTRUCTOR
+        public Node(Document document)
+        {
+            _document = document;
+        }
+
+        // HELPER METHODS
+        internal string GetDescendantText()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Node GetRoot()
+        {
             Node result = this;
 
-            while (result.ParentNode is not null)
-                result = result.ParentNode;
+            while (result.ParentNode is not null) { result = result.ParentNode; }
 
             return result;
+        }
+
+        // https://dom.spec.whatwg.org/#ref-for-string-replace-all
+        internal void StringReplaceAll(string? str)
+        {
+            // 1
+            Node? node = null;
+
+            // 2
+            if (!String.IsNullOrEmpty(str)) { node = new Text(str, NodeDocument); }
+
+            // 3
+            // TODO: MUTATION METHODS
+        }
+
+        // PUBLIC METHODS
+        public Node GetRootNode(bool composed)
+        {
+            throw new NotImplementedException();
         }
 
         public bool HasChildNodes() => ChildNodes is not null && ChildNodes.Count > 0 ? true : false;

@@ -2,37 +2,60 @@ namespace Luxor.DOM
 {
     public class Attr : Node 
     {
+        // PRIVATE FIELDS
+        private string _namespace;
+        private string _namespacePrefix;
+        private string _localName;
+        private string _qualifedName;
+        private string _value;
+        private Element element;
+
+        // PUBLIC PROPERTIES
+        public string NamespaceURI { get => _namespace; }
+        public string Prefix { get => _namespacePrefix; }
+        public string LocalName { get => _localName; }
+        public string Name { get => _qualifedName; }
+
+        public string Value
+        {
+            get => _value;
+
+            // https://dom.spec.whatwg.org/#set-an-existing-attribute-value
+            set
+            {
+                // 1
+                if (Element is null) { _value = value; }
+
+                // TODO: change attribute to value
+                // 2
+            }
+        }
+
+        public Element Element { get => element; }
+
+        // PUBLIC OVERRIDES
+        public override string NodeName { get => Name; }
+
+        public override string? NodeValue {
+            get => Value;
+            set
+            {
+                if (value is null) { value = ""; }
+                SetExistingValue(this, value);
+            }
+        }
+
+        public override string? TextContent { get => NodeValue; set => NodeValue = value; }
+
+        // CONSTRUCTOR
         public Attr(Document ownerDocument) : base(ownerDocument) {}
 
-        protected string LocalName { get; }
-        protected string Name { get; }
-        protected string? NamespaceURI { get; }
-        protected Element? OwnerElement { get; }
-        protected string? Prefix { get; }
-        protected string Value { get; }
-
-        /*
-        public override bool Equals(object? obj)
-        {         
-            if (obj is not null && obj is Attr)
-                return Equals((Attr) obj);
-            
-            return false;
-        }
-
-        public bool Equals(Attr otherAttr)
+        // PUBLIC METHODS
+        public void SetExistingValue(Attr attribute, string value)
         {
-            if (otherAttr is null)
-                return false;
- 
-            return this.Name!.Equals(otherAttr.Name);
+            throw new NotImplementedException();
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, Value);
-        }
-        */
-    }
+   }
 
 }

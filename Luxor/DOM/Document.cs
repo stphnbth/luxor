@@ -5,7 +5,7 @@ using static Data.DataTables;
 
 namespace Luxor.DOM
 {
-    public class Document // : Node
+    public class Document : Node
     {
         private string _encoding = "utf-8";
         private string _contentType = "application/xml";
@@ -14,6 +14,7 @@ namespace Luxor.DOM
         private string _mode = "no-quirks";
         private string _url = "about:blank";
 
+        private string? _baseURL;
         private string? _browsingContext = null;
 
         private enum DocumentReadyState
@@ -60,13 +61,9 @@ namespace Luxor.DOM
         // private EventHandler onvisibilitychange;
         */
 
+        internal string? BaseURL { get => _baseURL; set => _baseURL = value; }
         internal string? BrowsingContext { get => _browsingContext; set => _browsingContext = value; }
         internal string Type { get => _type; set => _type = value; }
-
-        public Document()
-        {
-
-        }
 
         public DOMImplementation Implementation { get; }
         public string URL { get => _url; }
@@ -76,6 +73,14 @@ namespace Luxor.DOM
         public string ContentType { get => _contentType; }
         public DocumentType? Doctype { get; }
         public Element? DocumentElement { get; }
+
+        public override string NodeName { get => "#document"; }
+
+        public Document()
+        {
+
+        }
+
 
 
         /*
@@ -199,7 +204,7 @@ namespace Luxor.DOM
             Element? result = null;
 
             // 4
-            CustomElementDefinition? definition = CustomElementDefinition.LookUp(ownerDocument, nspace, localName, options);
+            CustomElementDefinition? definition = CustomElementDefinition.LookUp(document, nspace, localName, options);
 
             if (definition is not null)
             {

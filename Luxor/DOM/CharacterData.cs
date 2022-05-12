@@ -4,17 +4,56 @@ namespace Luxor.DOM
 {
     public class CharacterData : Node 
     {
-        public CharacterData(Document ownerDocument) : base(ownerDocument) {}
+        // PRIVATE FIELDS
+        private string _data;
+        private UInt32 _length;
 
-        public string Data { get; set; }
+        // PUBLIC PROPERTIES
+        public string Data { get => _data; set => Replace(this, 0, Length, value); }
         public int Length { get; }
 
-        public void Append(string data) => Replace(Length, 0, Data);
-        public void Insert(int offset, string data) => Replace(offset, 0, data);
-        public void Delete(int offset, int count) => Replace(offset, count, "");
+        // PUBLIC OVERRIDES
+        public override string? NodeValue {
+            get => Data;
+            set
+            {
+                if (value is null) { value = ""; }
+                Replace(this, 0, Length, value);
+            }
+        }
 
-        public void  Replace(int offset, int count, string data)
+        public override string? TextContent { get => NodeValue; set => NodeValue = value; }
+
+        // CONSTRUCTOR
+        public CharacterData(string data, Document nodeDocument) : base(nodeDocument)
         {
+            _data = data;
+        }
+
+        // PUBLIC METHODS
+        public void Append(string data) => Replace(this, Length, 0, Data);
+        public void Insert(int offset, string data) => Replace(this, offset, 0, data);
+        public void Delete(int offset, int count) => Replace(this, offset, count, "");
+
+        // https://dom.spec.whatwg.org/#concept-cd-replace
+        public void Replace(Node node, int offset, int count, string data)
+        {
+            // 1
+
+            // 2
+
+            // 3
+
+            // 4
+
+            // 5
+
+            // 6
+
+            // 6
+
+            //
+
             // TODO: setup range errors
             if (offset > Length) {}
 
@@ -28,7 +67,7 @@ namespace Luxor.DOM
 
             // TODO: FOREACH LIVE RANGES
 
-            if (ParentNode is not null)
+            if (node.ParentNode is not null)
             {
                 // TODO: CHILDREN CHANGED STEPS                
             }
