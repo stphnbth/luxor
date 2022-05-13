@@ -82,10 +82,10 @@ namespace Luxor.DOM
 
         // PUBLIC OVERRIDES
         public override string NodeName { get => TagName; }
-        public override string? TextContent { get => GetDescendantText(); set => StringReplaceAll(value); }
+        public override string TextContent { get => GetDescendantText(); set => StringReplaceAll(value); }
 
         // CONSTRUCTOR
-        public Element(Document ownerDocument, NamedNodeMap attributes, string? nspace, string? prefix, string localName, CustomElementState ceState, CustomElementDefinition? ceDefinition, string? options) : base(ownerDocument)
+        public Element(Document nodeDocument, NamedNodeMap attributes, string? nspace, string? prefix, string localName, CustomElementState ceState, CustomElementDefinition? ceDefinition, string? options) : base(nodeDocument)
         {
             _attributes = attributes;
             _namespace = nspace;
@@ -97,6 +97,8 @@ namespace Luxor.DOM
 
             _classList = new List<string>();
         }
+
+        public Element(Document nodeDocument) : base(nodeDocument) {}
 
         // HELPER METHODS
         internal void EnqueueElementOnAppropriateQueue(Element element)

@@ -1,8 +1,8 @@
-namespace Luxor.DOM
+namespace Luxor.DOM.HTML
 {
-    public class HTMLElement // : Element 
+    public class HTMLElement : Element
     {
-        
+        // PRIVATE FIELDS
         private string _accessKey;
         private string _accessKeyLabel;
         private string _autocapitalize;
@@ -17,6 +17,7 @@ namespace Luxor.DOM
         private string _title;        
         private bool _translate;
 
+        // PUBLIC PROPERTIES
         public string AccessKey { get => _accessKey; set => _accessKey = value; }
         public string AccessKeyLabel { get => _accessKeyLabel; set => _accessKeyLabel = value; }
         public string Autocapitalize { get => _autocapitalize; set => _autocapitalize = value; }
@@ -31,6 +32,10 @@ namespace Luxor.DOM
         public string Title { get => _title; set => _title = value; }
         public bool Translate { get => _translate; set => _translate = value; }
 
+        // CONSTRUCTOR
+        public HTMLElement(Document nodeDocument) : base(nodeDocument) {}
+
+        // PUBLIC METHODS
         public ElementInternals attachInternals()
         {
             throw new NotImplementedException();
@@ -39,6 +44,7 @@ namespace Luxor.DOM
 
     public class HTMLUnknownElement : HTMLElement
     {
-        
+        public HTMLUnknownElement(Document nodeDocument) : base(nodeDocument) {}
+
     }
 }

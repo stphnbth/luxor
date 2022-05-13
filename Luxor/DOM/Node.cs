@@ -188,6 +188,12 @@ namespace Luxor.DOM
         {
             throw new NotImplementedException();
         }
+
+        // MUTATION ALGORITHMS //
+        public void Append(Node node)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public enum NodeType
