@@ -2,11 +2,13 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 using Luxor.DOM.HTML;
+using Luxor.DOM.XPath;
 using static Data.DataTables;
 
 namespace Luxor.DOM
 {
-    public class Document : Node
+    public class Document : Node, INonElementParentNode, IDocumentOrShadowRoot, IParentNode,
+        IXPathEvaluator
     {
         // https://dom.spec.whatwg.org/#interface-document
 
@@ -25,7 +27,7 @@ namespace Luxor.DOM
         internal string Type { get => _type; set => _type = value; }
 
         // PUBLIC PROPERTIES
-        public DOMImplementation Implementation { get; }
+        public IDOMImplementation Implementation { get; }
         public string URL { get => _url; }
         public string DocumentURI { get => _url; }
         public string CompatMode { get => _mode == "quirks" ? "BackCompat" : "CSS1Compat"; }
@@ -36,7 +38,6 @@ namespace Luxor.DOM
 
         // PUBLIC OVERRIDES
         public override string NodeName { get => "#document"; }
-
 
         // https://html.spec.whatwg.org/#the-document-object
 
@@ -424,5 +425,12 @@ namespace Luxor.DOM
             Visible,
             Hidden
         }
+    }
+
+    public interface IDocumentOrShadowRoot {}
+
+    public struct ElementCreationOptions
+    {
+        string is;
     }
 }

@@ -1,12 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using System.Diagnostics;
-
-using Extensions;
-using static Data.DataTables;
-
 namespace Luxor.DOM
 {
     public abstract class Node
@@ -159,7 +150,7 @@ namespace Luxor.DOM
         }
 
         // PUBLIC METHODS
-        public Node GetRootNode(bool composed)
+        public Node GetRootNode(GetRootNodeOptions? options = null)
         {
             throw new NotImplementedException();
         }
@@ -226,6 +217,21 @@ namespace Luxor.DOM
         {
             throw new NotImplementedException();
         }
+    }
+
+    // https://dom.spec.whatwg.org/#nonelementparentnode
+    public interface INonElementParentNode
+    {
+        public Element? GetElementById(string elementId)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public struct GetRootNodeOptions
+    {
+        public bool composed = false;
+        public GetRootNodeOptions() {}
     }
 
     public enum NodeType

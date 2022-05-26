@@ -8,18 +8,22 @@ using static Data.DataTables;
 
 namespace Luxor.DOM
 {
-    public class DocumentType : Node
+    // https://dom.spec.whatwg.org/#documenttype
+    public class DocumentType : Node, IChildNode
     {
+        // PRIVATE FIELDS
         private string _name;
         private string _publicID;
         private string _systemID;
 
+        // PUBLIC PROPERTIES
         public string Name { get => _name; }
         public string PublicID { get => _publicID; }
         public string SystemID { get => _systemID; }
 
         public override string NodeName { get => Name; }
 
+        // CONSTRUCTOR
         public DocumentType(Document ownerDocument) : base(ownerDocument) {}
     }
 

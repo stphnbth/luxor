@@ -2,22 +2,30 @@ using System.Diagnostics;
 
 namespace Luxor.DOM
 {
-    public class ShadowRoot : DocumentFragment
+    // https://dom.spec.whatwg.org/#shadowroot
+    public class ShadowRoot : DocumentFragment, IDocumentOrShadowRoot
     {
-        private bool _delegatesFocus = false;
-        private bool _availableToInternals = false;
-        
-        public ShadowRootMode Mode { get; }
-        public SlotAssignmentMode SlotAssignment { get; }
-        
-        public bool DelegatesFocus { get => _delegatesFocus; internal set => _delegatesFocus = value; }
-        public bool AvailableToInternals { get => _availableToInternals; internal set => _availableToInternals = value; }
+        // PRIVATE FIELDS
+        private ShadowRootMode _mode;
+        private bool _delegatesFocus;
+        private SlotAssignmentMode _slotAssignment;
+        private Element _host;
 
-        public ShadowRoot(Document? ownerDocument, Element host, ShadowRootMode mode, SlotAssignmentMode slotAssignment) : base(ownerDocument, host)
-        {
-            Mode = mode;
-            SlotAssignment = slotAssignment;
-        }
+        private EventHandler onslotchange;
+
+        private bool _availableToInternals;
+
+        // PUBLIC PROPERTIES
+        public ShadowRootMode Mode { get => _mode; }
+        public bool DelegatesFocus { get => _delegatesFocus; }
+        public SlotAssignmentMode SlotAssignment { get => _slotAssignment; }
+        public Element Host { get => _host; }
+
+        // INTERNAL PROPERTIES
+        internal bool AvailableToInternals { get => _availableToInternals; set => _availableToInternals = value; }
+
+        // CONSTRUCTOR
+        private ShadowRoot(Document ownerDocument) : base(ownerDocument) {}
     }
 
     public enum ShadowRootMode

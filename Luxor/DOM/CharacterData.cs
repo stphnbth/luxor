@@ -1,15 +1,14 @@
-using System.Diagnostics;
-
 namespace Luxor.DOM
 {
-    public class CharacterData : Node 
+    // https://dom.spec.whatwg.org/#characterdata
+    public class CharacterData : Node, IChildNode, INonDocumentTypeChildNode
     {
         // PRIVATE FIELDS
         private string _data;
         private UInt32 _length;
 
         // PUBLIC PROPERTIES
-        public string Data { get => _data; set => Replace(this, 0, Length, value); }
+        public string Data { get => _data; set => ReplaceData(this, 0, Length, value); }
         public int Length { get; }
 
         // PUBLIC OVERRIDES
@@ -18,7 +17,7 @@ namespace Luxor.DOM
             set
             {
                 if (value is null) { value = ""; }
-                Replace(this, 0, Length, value);
+                ReplaceData(this, 0, Length, value);
             }
         }
 
@@ -31,12 +30,12 @@ namespace Luxor.DOM
         }
 
         // PUBLIC METHODS
-        public void Append(string data) => Replace(this, Length, 0, Data);
-        public void Insert(int offset, string data) => Replace(this, offset, 0, data);
-        public void Delete(int offset, int count) => Replace(this, offset, count, "");
+        public void AppendData(string data) => ReplaceData(this, Length, 0, Data);
+        public void InsertData(int offset, string data) => ReplaceData(this, offset, 0, data);
+        public void DeleteData(int offset, int count) => ReplaceData(this, offset, count, "");
 
         // https://dom.spec.whatwg.org/#concept-cd-replace
-        public void Replace(Node node, int offset, int count, string data)
+        public void ReplaceData(Node node, int offset, int count, string data)
         {
             // 1
 
@@ -74,7 +73,7 @@ namespace Luxor.DOM
 
         }
 
-        public string Substring(int offset, int count) => Data.Substring(offset, count);
+        public string SubstringData(int offset, int count) => Data.Substring(offset, count);
         
     }
 }

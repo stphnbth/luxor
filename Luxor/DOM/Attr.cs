@@ -1,6 +1,7 @@
 namespace Luxor.DOM
 {
-    public class Attr : Node 
+    // https://dom.spec.whatwg.org/#attr
+    public class Attr : Node
     {
         // PRIVATE FIELDS
         private string _namespace;
@@ -8,7 +9,7 @@ namespace Luxor.DOM
         private string _localName;
         private string _qualifedName;
         private string _value;
-        private Element element;
+        private Element _element;
 
         // PUBLIC PROPERTIES
         public string NamespaceURI { get => _namespace; }
@@ -24,14 +25,14 @@ namespace Luxor.DOM
             set
             {
                 // 1
-                if (Element is null) { _value = value; }
+                if (_element is null) { _value = value; }
 
                 // TODO: change attribute to value
                 // 2
             }
         }
 
-        public Element Element { get => element; }
+        public Element OwnerElement { get => _element; }
 
         // PUBLIC OVERRIDES
         public override string NodeName { get => Name; }

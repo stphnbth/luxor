@@ -4,7 +4,7 @@ using static Data.DataTables;
 
 namespace Luxor.DOM
 {
-    public class Element : Node 
+    public class Element : Node, IChildNode, INonDocumentTypeChildNode, IParentNode, ISlottable
     {
         // PRIVATE FIELDS
         private string? _is = null;
@@ -352,5 +352,13 @@ namespace Luxor.DOM
             Precustomized,
             Custom
         }
+    }
+
+    public struct ShadowRootInit
+    {
+        public ShadowRootMode mode = ShadowRootMode.Open;
+        public bool delegatesFocus = false;
+        public SlotAssignmentMode SlotAssignment = SlotAssignmentMode.Named;
+        public ShadowRootInit() {}
     }
 }

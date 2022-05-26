@@ -1,7 +1,6 @@
-using System.Diagnostics;
-
 namespace Luxor.DOM
 {
+    // https://dom.spec.whatwg.org/#processinginstruction
     public class ProcessingInstruction : Text
     {        
         private string _target;
@@ -10,8 +9,7 @@ namespace Luxor.DOM
 
         public override string NodeName { get => Target; }
 
-        public ProcessingInstruction() : base () {}
-
+        public ProcessingInstruction(Document nodeDocument) : base ("", nodeDocument) {}
     }
 }
 

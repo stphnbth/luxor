@@ -1,49 +1,55 @@
 
 namespace Luxor.DOM
 {
+    // https://dom.spec.whatwg.org/#treewalker
     public class TreeWalker
     {
-        public TreeWalker(Node root)
-        {
-            Root = root;
-            CurrentNode = root;
-        }
+        // PRIVATE FIELDS
+        private Node _root;
+        private NodeFilterShow _whatToShow;
+        private INodeFilter? _filter;
+        private Node _currentNode;
 
-        public Node Root { get; }
-        public int WhatToShow { get; }
-        public Node CurrentNode { get; set; }
+        // PUBLIC PROPERTIES
+        public Node Root { get => _root; set => _root = value; }
+        public NodeFilterShow WhatToShow { get => _whatToShow; set => _whatToShow = value; }
+        public INodeFilter? Filter { get => _filter; set => _filter = value; }
+        public Node CurrentNode { get => _currentNode; set => _currentNode = value; }
 
-        public Node? parentNode()
-        {
-            throw new NotImplementedException();
-        }
+        // CONSTRUCTOR
+        private TreeWalker() {}
 
-        public Node? fristChild()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Node? lastChild()
+        public Node? ParentNode()
         {
             throw new NotImplementedException();
         }
 
-        public Node? previousSibling()
+        public Node? FristChild()
         {
             throw new NotImplementedException();
         }
 
-        public Node? nextSibling()
+        public Node? LastChild()
         {
             throw new NotImplementedException();
         }
 
-        public Node? previousNode()
+        public Node? PreviousSibling()
         {
             throw new NotImplementedException();
         }
 
-        public Node? nextNode()
+        public Node? NextSibling()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Node? PreviousNode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Node? NextNode()
         {
             throw new NotImplementedException();
         }

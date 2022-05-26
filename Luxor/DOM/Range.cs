@@ -2,18 +2,25 @@ using System.Diagnostics;
 
 namespace Luxor.DOM
 {
-    public class Range
+    // https://dom.spec.whatwg.org/#range
+    public class Range : AbstractRange
     {
+        // PRIVATE FIELDS
+        private Node _commonAncestorContainer;
+
+        // PUBLIC PROPERTIES
+        public Node CommonAncestorContainer { get => _commonAncestorContainer; }
+
+        // CONSTRUCTOR
         public Range() {}
 
-        public Node? CommonAncestor { get; }
-
-        public void SetStart(Node node, int offset)
+        // PUBLIC METHODS
+        public void SetStart(Node node, ulong offset)
         {
             throw new NotImplementedException();
         }
 
-        public void SetEnd(Node node, int offset)
+        public void SetEnd(Node node, ulong offset)
         {
             throw new NotImplementedException();
         }
@@ -53,5 +60,59 @@ namespace Luxor.DOM
             throw new NotImplementedException();
         }
 
+        public short CompareBoundaryPoints(ushort how, Range sourceRange)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public void DeleteContents()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public DocumentFragment ExtractContents()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public DocumentFragment CloneContents()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public void InsertNode(Node node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SurroundContents(Node newParent)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public Range CloneRange()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public void Detach()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool IsPointInRange(Node node, ulong offset)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public short ComparePoint(Node node, ulong offest)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool InstersectsNode(Node node)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

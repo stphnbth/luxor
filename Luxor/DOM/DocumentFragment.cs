@@ -2,22 +2,14 @@ using System.Diagnostics;
 
 namespace Luxor.DOM
 {
-    public class DocumentFragment : Node
+    // https://dom.spec.whatwg.org/#documentfragment
+    public class DocumentFragment : Node, INonElementParentNode, IParentNode
     {
-        // PRIVATE FIELDS
-        private Element _host;
-
-        // INTERNAL PROPERTIES
-        internal Element Host { get => _host; set => _host = value; }
-
         // PUBLIC OVERRIDES
         public override string NodeName { get => "#document-fragment"; }
         public override string? TextContent { get => GetDescendantText(); set => StringReplaceAll(value); }
 
         // CONSTRUCTOR
-        public DocumentFragment(Document nodeDocument, Element host) : base(nodeDocument)
-        {
-            _host = host;
-        }
+        public DocumentFragment(Document nodeDocument) : base(nodeDocument) {}
     }
 }
