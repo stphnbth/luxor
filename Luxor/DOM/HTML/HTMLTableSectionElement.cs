@@ -1,5 +1,6 @@
 namespace Luxor.DOM.HTML
 {
+    // https://html.spec.whatwg.org/multipage/tables.html#htmltablesectionelement
     public class HTMLTableSectionElement : HTMLElement
     {
         // PRIVATE FIELDS
@@ -12,7 +13,14 @@ namespace Luxor.DOM.HTML
         public HTMLTableSectionElement(Document nodeDocument) : base(nodeDocument) {}
 
         // PUBLIC METHODS
-        internal HTMLTableRowElement insertRow(Int32? index = -1) { throw new NotImplementedException(); }
-        internal void deleteRow(Int32 index) { throw new NotImplementedException(); }
+        internal HTMLTableRowElement insertRow(Int32? index = -1)
+        {
+            throw new NotImplementedException();
+        }
+        
+        internal void deleteRow(Int32 index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,5 +1,6 @@
 namespace Luxor.DOM.HTML
 {
+    // https://html.spec.whatwg.org/multipage/tables.html#htmltablecellelement
     public class HTMLTableCellElement : HTMLElement
     {
         // PRIVATE FIELDS

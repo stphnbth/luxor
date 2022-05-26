@@ -157,7 +157,7 @@ namespace Luxor.DOM
             set
             {
                 // 1
-                if (value )
+                if (value is HTMLBo )
 
                 // 2
             }

@@ -1,5 +1,6 @@
 namespace Luxor.DOM.HTML
 {
+    // https://html.spec.whatwg.org/multipage/form-elements.html#htmloptgroupelement
     public class HTMLOptionElement : HTMLElement
     {
         // PRIVATE FIELDS

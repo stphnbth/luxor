@@ -16,8 +16,15 @@ namespace Luxor.DOM.HTML
         public HTMLTableRowElement(Document nodeDocument) : base(nodeDocument) {}
 
         // PUBLIC METHODS
-        public HTMLTableCellElement insertCell(Int32? index = -1) { throw new NotImplementedException(); }
-        public void deleteCell(Int32 index) { throw new NotImplementedException(); }
+        public HTMLTableCellElement insertCell(long? index = -1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void deleteCell(long index) 
+        {
+            throw new NotImplementedException();
+        }
         
     }
 }

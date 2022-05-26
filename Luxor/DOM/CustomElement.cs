@@ -1,3 +1,5 @@
+using Luxor.DOM.HTML;
+
 using static Data.DataTables;
 
 namespace Luxor.DOM
@@ -46,20 +48,42 @@ namespace Luxor.DOM
 
     public class CustomElementRegistry
     {
+        // PRIVATE FIELDS
         private List<CustomElementDefinition> _definitions;
         private bool _definitionIsRunning;
         private Dictionary<string, Task> _whenDefinedMap;
 
-        public List<CustomElementDefinition> Definitions { get => _definitions; set => _definitions = value; }
-        public bool DefinitionIsRunning { get => _definitionIsRunning; set => _definitionIsRunning = value; }
-        public Dictionary<string, Task> WhenDefinedMap { get => _whenDefinedMap; set => _whenDefinedMap = value; }
+        // INTERNAL PROPERTIES
+        internal List<CustomElementDefinition> Definitions { get => _definitions; }
+        internal bool DefinitionIsRunning { get => _definitionIsRunning; }
+        internal Dictionary<string, Task> WhenDefinedMap { get => _whenDefinedMap; }
 
         public CustomElementRegistry() {}
 
-        public void Define(string name, CustomElementConstructor constructor, string? extends) { throw new NotImplementedException(); }
-        public CustomElementConstructor? Get(string name) { throw new NotImplementedException(); }
-        public async Task<CustomElementConstructor> WhenDefine(string name) { throw new NotImplementedException(); }
-        public void Upgrade(Node root) { throw new NotImplementedException(); }
+        public void Define(string name, CustomElementConstructor constructor, ElementDefinitionOptions? extends = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public CustomElementConstructor? Get(string name)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public async Task<CustomElementConstructor> WhenDefine(string name) 
+        {
+            throw new NotImplementedException(); 
+        }
+        
+        public void Upgrade(Node root) 
+        {
+            throw new NotImplementedException(); 
+        }
+    }
+
+    public struct ElementDefinitionOptions
+    {
+        public string extends;
     }
 
     public delegate void LCCallback(string callback);

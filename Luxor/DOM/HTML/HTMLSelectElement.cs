@@ -1,6 +1,7 @@
 namespace Luxor.DOM.HTML
 {
-    public class HTMLSelectElement : HTMLElement
+    // https://html.spec.whatwg.org/multipage/form-elements.html#htmlselectelement
+    public class HTMLSelectElement : HTMLElement, IValidityState
     {
         // PRIVATE FIELDS
         private string _autocomplete;
@@ -16,9 +17,6 @@ namespace Luxor.DOM.HTML
         private List<Element> _selectedOptions;
         private ulong _selectedIndex;
         private string _value;
-        private bool _willValidate;
-        private string _validity;
-        private string _validationMessage;
         private List<Node> _labels;
 
         // PUBLIC PROPERTIES
@@ -29,16 +27,22 @@ namespace Luxor.DOM.HTML
         public string Name { get => _name; set => _name = value; }
         public bool Required { get => _required; set => _required = value; }
         public ulong Size { get => _size; set => _size = value; }
-        public string Type { get => _type; set => _type = value; }
-        public List<HTMLOptionElement> Options { get => _options; set => _options = value; }
+        public string Type { get => _type; }
+        public List<HTMLOptionElement> Options { get => _options; }
         public ulong Length { get => _length; set => _length = value; }
-        public List<Element> SelectedOptions { get => _selectedOptions; set => _selectedOptions = value; }
+        public List<Element> SelectedOptions { get => _selectedOptions; }
         public ulong SelectedIndex { get => _selectedIndex; set => _selectedIndex = value; }
         public string Value { get => _value; set => _value = value; }
+        public List<Node> Labels { get => _labels; }
+
+        // IValidityState Implementation
+        private bool _willValidate;
+        private ValidityState _validity;
+        private string _validationMessage;
+
         public bool WillValidate { get => _willValidate; set => _willValidate = value; }
-        public string Validity { get => _validity; set => _validity = value; }
+        public ValidityState Validity { get => _validity; set => _validity = value; }
         public string ValidationMessage { get => _validationMessage; set => _validationMessage = value; }
-        public List<Node> Labels { get => _labels; set => _labels = value; }
 
         // CONSTRUCTOR
         public HTMLSelectElement(Document nodeDocument) : base(nodeDocument) {}

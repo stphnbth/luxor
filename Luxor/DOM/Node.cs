@@ -20,7 +20,7 @@ namespace Luxor.DOM
         private bool _isConnected;
         private Node? _parentNode;
         private Element? _parentElement;
-        private List<Node>? _children;
+        private List<Node> _children;
         private Node? _firstChild;
         private Node? _lastChild;
         private Node? _previousSibling;
@@ -48,7 +48,7 @@ namespace Luxor.DOM
         public Element? ParentElement { get => _parentElement; }
 
         // TODO: node children are parsed and filtered, I think....
-        public List<Node>? ChildNodes { get => _children; }
+        public List<Node> ChildNodes { get => _children; }
 
         public Node? FirstChild
         {
@@ -117,7 +117,45 @@ namespace Luxor.DOM
             if (!String.IsNullOrEmpty(str)) { node = new Text(str, NodeDocument); }
 
             // 3
-            // TODO: MUTATION METHODS
+            ReplaceAll(this, this.ParentNode);
+        }
+
+        // MUTATION ALGORITHMS //
+        public void Append(Node node)
+        {
+            throw new NotImplementedException();
+        }
+
+        // https://dom.spec.whatwg.org/#concept-node-replace-all
+        public void ReplaceAll(Node node, Node parent)
+        {
+            /*
+            // 1
+            List<Node> removedNodes = parent.ChildNodes;
+
+            // 2
+            List<Node> addedNodes = new List<Node>();
+
+            // 3
+            if (node is DocumentFragment)
+            {
+                addedNodes = node.ChildNodes;
+            }
+
+            // 4
+            else
+            {
+
+            }
+
+            // 5
+
+            // 6
+
+            // 7
+            */
+
+            throw new NotImplementedException();
         }
 
         // PUBLIC METHODS
@@ -185,12 +223,6 @@ namespace Luxor.DOM
         }
 
         public Node RemoveChild(Node child)
-        {
-            throw new NotImplementedException();
-        }
-
-        // MUTATION ALGORITHMS //
-        public void Append(Node node)
         {
             throw new NotImplementedException();
         }

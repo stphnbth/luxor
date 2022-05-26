@@ -21,14 +21,49 @@ namespace Luxor.DOM.HTML
         public HTMLTableElement(Document nodeDocument) : base(nodeDocument) {}
 
         // PUBLIC METHODS
-        public HTMLTableCaptionElement createCaption() { throw new NotImplementedException(); }
-        public void deleteCaption() { throw new NotImplementedException(); }
-        public HTMLTableSectionElement createTHead() { throw new NotImplementedException(); }
-        public void deleteTHead() { throw new NotImplementedException(); }
-        public HTMLTableSectionElement createTFoot() { throw new NotImplementedException(); }
-        public void deleteTFoot() { throw new NotImplementedException(); }
-        public HTMLTableSectionElement createTBody() { throw new NotImplementedException(); }
-        public HTMLTableRowElement insertRow(Int32? index = -1) { throw new NotImplementedException(); }
-        public void deleteRow(Int32 index) { throw new NotImplementedException(); }
+        public HTMLTableCaptionElement createCaption()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void deleteCaption()
+        {
+            throw new NotImplementedException();
+        }
+
+        public HTMLTableSectionElement createTHead()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void deleteTHead()
+        {
+            throw new NotImplementedException();
+        }
+
+        public HTMLTableSectionElement createTFoot()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void deleteTFoot()
+        {
+            throw new NotImplementedException();
+        }
+
+        public HTMLTableSectionElement createTBody()
+        {
+            throw new NotImplementedException();
+        }
+
+        public HTMLTableRowElement insertRow(Int32? index = -1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void deleteRow(Int32 index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
