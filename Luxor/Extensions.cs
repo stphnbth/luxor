@@ -1,5 +1,6 @@
 using System.Reflection;
-using System.Text;
+using System.Linq.Expressions;
+
 
 namespace Extensions
 {
@@ -25,6 +26,8 @@ namespace Extensions
             0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, // U+00E0..U+00EF
             0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x19, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, // U+00F0..U+00FF
         };
+
+        // STREAM EXTENSIONS
 
         public static char[] ExposeCharBuffer(this StreamReader sr, int size)
         {
@@ -77,6 +80,8 @@ namespace Extensions
             return new byte[0];
         }
 
+        // STRING EXTENSIONS
+
         public static bool IsAsciiWhiteSpace(this char c)
         {
             if (c > 0x00FF) { return false; }
@@ -84,16 +89,42 @@ namespace Extensions
             if ((_charInfo[c] & 0x80) != 0) { return true; }
 
             return false;
-        }  
+        }
 
         // TODO: IsNonCharacter is meant for codepoints...
         public static bool IsNonCharacter(this char c)
         {
             // U+FDD0 to U+FDEF
-            return c >= 0xFFD0 && c <= 0xFDEF; 
+            return c >= 0xFFD0 && c <= 0xFDEF;
 
             //  U+xxFFFE or U+xxFFFF
 
         }
+
+        // https://infra.spec.whatwg.org/#split-on-ascii-whitespace
+        public static List<string> SplitOnASCIIWhitespace(this string input)
+        {
+            // 1
+            int position = 0;
+
+            // 2
+            List<string> tokens = new List<string>();
+
+            // 3
+
+
+            // 4
+                // 4.1
+
+                // 4.2
+                
+                // 4.3
+
+            // 5
+            return tokens;
+
+        }
+
+
     }
 }
