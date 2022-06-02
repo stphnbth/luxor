@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Luxor.Infra.Collections
 {
-    public interface IList<T> : ICollection<T>, ICollection, IEnumerable<T>, IEnumerable
+    public interface IDOMList<T> : ICollection<T>, IEnumerable<T>, IEnumerable
     {
         // Append - https://infra.spec.whatwg.org/#list-append
         void Append(T item) { Add(item); }
@@ -56,7 +56,7 @@ namespace Luxor.Infra.Collections
         void SortDescending();
     }
 
-    public class List<T> : IList<T>
+    public abstract class DOMList<T> : IDOMList<T>
     {
         // PRIVATE FIELDS
         private T[] _items;
@@ -67,11 +67,6 @@ namespace Luxor.Infra.Collections
         public int Size => Count;
         public int Count => _size;
         public bool IsReadOnly => false;
-        public bool IsSynchronized => false;
-        public object SyncRoot => this;
-
-        // CONSTRUCTORS
-        List() {}
 
         // PUBLIC METHODS
         public void Add(T item)
@@ -125,9 +120,6 @@ namespace Luxor.Infra.Collections
             throw new NotImplementedException();
         }
 
-        public IEnumerator<T> GetEnumerator()
-            => _items.GetEnumerator();
-
         public Set<int> GetIndices()
         {
             throw new NotImplementedException();
@@ -152,7 +144,15 @@ namespace Luxor.Infra.Collections
 
         public bool Remove(T item)
         {
-            throw new NotImplementedException();
+            int index = IndexOf(item);
+
+            if (index >= 0)
+            {
+                RemoveAt(index);
+                return true;
+            }
+
+            return false;
         }
 
         public void Replace(Func<bool> condition, T item)
@@ -168,6 +168,14 @@ namespace Luxor.Infra.Collections
         public void SortDescending()
         {
             throw new NotImplementedException();
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (T item in _items)
+            {
+                yield return item;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

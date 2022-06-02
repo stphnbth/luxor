@@ -1,6 +1,6 @@
 namespace Luxor.Infra.Collections
 {
-    public class Stack<T> : List<T>
+    public interface IStack<T> : IEnumerable<T>
     {
         // Push
 

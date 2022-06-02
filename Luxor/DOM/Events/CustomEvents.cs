@@ -4,19 +4,23 @@ namespace Luxor.DOM.Events
     public class CustomEvent : Event
     {
         // PRIVATE FIELDS
-        private object _detail;
+        private object? _detail;
 
         // PUBLIC PROPERTIES
-        public object Detail { get => _detail; set => _detail = value; }
+        public object? Detail { get => _detail; }
 
 
         // CONSTRUCTOR
-        CustomEvent(string type, CustomEventInit? eventInit = null) : base(type) {}
-
+        public CustomEvent(string type) : base (type) { _detail = null; }
+        public CustomEvent(string type, CustomEventInit eventInit) : base(type, eventInit.init.bubbles, eventInit.init.cancelable)
+        {
+            _detail = eventInit.detail;
+        }
     }
 
     public struct CustomEventInit
     {
+        public EventInit init = new EventInit();
         public object? detail = null;
         public CustomEventInit() {}
     }
